@@ -21,6 +21,8 @@ import {
 } from "@/lib/events-store";
 import EventDialog from "./EventDialog";
 import TodayDialog from "./TodayDialog";
+import AppMenu from "./AppMenu";
+import SearchBox from "./SearchBox";
 
 const MAX_CHIPS = 3;
 
@@ -53,11 +55,46 @@ export default function Calendar() {
     return map;
   }, [events]);
 
+  const goToday = useCallback(() => {
+    setView(null);
+    setSelected(null);
+  }, []);
+
+  /** 検索結果などから、指定カレンダーの指定日へ移動する */
+  const jumpTo = useCallback((k: CalendarKind, date: string) => {
+    const d = parseDateKey(date);
+    setCalendarKind(k);
+    setView({ year: d.getFullYear(), month: d.getMonth() });
+    setSelected(date);
+  }, []);
+
+  const header = (
+    <header className="border-b border-zinc-200 bg-white px-4 py-2 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="mx-auto flex max-w-6xl items-center gap-2">
+        <AppMenu
+          kind={kind}
+          onSelectKind={setCalendarKind}
+          onShowToday={() => setShowToday(true)}
+          onGoToday={goToday}
+        />
+        <h1 className="hidden shrink-0 text-lg font-bold sm:block">
+          キズナテック カレンダー
+        </h1>
+        <div className="flex flex-1 justify-end">
+          <SearchBox onJump={jumpTo} />
+        </div>
+      </div>
+    </header>
+  );
+
   if (!today) {
     return (
-      <div className="flex flex-1 items-center justify-center text-zinc-500">
-        読み込み中…
-      </div>
+      <>
+        {header}
+        <div className="flex flex-1 items-center justify-center text-zinc-500">
+          読み込み中…
+        </div>
+      </>
     );
   }
 
@@ -75,11 +112,6 @@ export default function Calendar() {
     setView({ year: d.getFullYear(), month: d.getMonth() });
   };
 
-  const goToday = () => {
-    setView(null);
-    setSelected(null);
-  };
-
   const openNew = (date: string) =>
     setEditing({
       isNew: true,
@@ -95,6 +127,8 @@ export default function Calendar() {
     });
 
   return (
+    <>
+    {header}
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 p-4">
       {/* カレンダーの切り替え */}
       <div className="flex flex-wrap items-center gap-3">
@@ -315,5 +349,6 @@ export default function Calendar() {
         />
       )}
     </div>
+    </>
   );
 }
