@@ -12,16 +12,19 @@ import {
   useEvents,
   type CalendarKind,
 } from "@/lib/events-store";
+import type { ClassOccurrence } from "@/lib/timetable";
 
 type Props = {
   today: string;
+  /** 今日の時間割の授業 */
+  classes: ClassOccurrence[] | null;
   onClose: () => void;
 };
 
 const KINDS: CalendarKind[] = ["shared", "personal"];
 
 /** 起動時に、共通・個人カレンダーの今日の予定をまとめて表示するポップアップ */
-export default function TodayDialog({ today, onClose }: Props) {
+export default function TodayDialog({ today, classes, onClose }: Props) {
   const shared = useEvents("shared");
   const personal = useEvents("personal");
   const states = { shared, personal };
@@ -39,7 +42,7 @@ export default function TodayDialog({ today, onClose }: Props) {
 
   const total = KINDS.reduce(
     (n, k) => n + todays(states[k].events).length,
-    0,
+    classes?.length ?? 0,
   );
 
   return (
@@ -113,6 +116,39 @@ export default function TodayDialog({ today, onClose }: Props) {
               </div>
             );
           })}
+
+          <div className="space-y-1">
+            <h3 className="text-xs font-semibold text-zinc-500">時間割</h3>
+            {!classes ? (
+              <p className="py-2 text-sm text-zinc-500">読み込み中…</p>
+            ) : classes.length === 0 ? (
+              <p className="py-2 text-sm text-zinc-500">今日の授業はありません</p>
+            ) : (
+              <ul className="space-y-1">
+                {[...classes]
+                  .sort((a, b) => a.start.localeCompare(b.start))
+                  .map((c) => (
+                    <li key={c.id} className="flex items-start gap-3 rounded-xl p-2">
+                      <span
+                        className={`mt-1.5 size-2.5 shrink-0 rounded-sm ${COLORS[c.color].dot}`}
+                      />
+                      <span className="w-24 shrink-0 text-sm text-zinc-500 tabular-nums">
+                        {c.start}〜{c.end}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium break-words">
+                          {c.subject}
+                        </span>
+                        <span className="block text-xs text-zinc-500">
+                          {c.room ? `${c.room}・` : ""}
+                          {c.timetableTitle}
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         <button

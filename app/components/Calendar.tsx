@@ -10,6 +10,7 @@ import {
   parseDateKey,
   toDateKey,
   type CalendarEvent,
+  type EventColor,
 } from "@/lib/calendar";
 import {
   CALENDAR_LABELS,
@@ -19,18 +20,46 @@ import {
   useToday,
   type CalendarKind,
 } from "@/lib/events-store";
+import { logout } from "@/lib/auth-store";
+import { expandTimetables, type ClassOccurrence } from "@/lib/timetable";
+import { useMyTimetables } from "@/lib/timetable-store";
+import type { User } from "@/lib/user";
 import EventDialog from "./EventDialog";
 import TodayDialog from "./TodayDialog";
 import AppMenu from "./AppMenu";
 import SearchBox from "./SearchBox";
+import TimetableManager from "./TimetableManager";
 
 const MAX_CHIPS = 3;
 
 type Editing = { event: CalendarEvent; isNew: boolean };
 
-export default function Calendar() {
+/** 1 日分に表示する項目 (予定 または 時間割の授業) */
+type DayItem =
+  | { type: "event"; key: string; start?: string; event: CalendarEvent }
+  | { type: "class"; key: string; start?: string; cls: ClassOccurrence };
+
+const itemTitle = (i: DayItem) =>
+  i.type === "event" ? i.event.title : i.cls.subject;
+const itemColor = (i: DayItem): EventColor =>
+  i.type === "event" ? i.event.color : i.cls.color;
+
+/** 終日の予定 → 時刻順 (予定と授業を混ぜて並べる) */
+function sortItems(items: DayItem[]) {
+  return items.sort((a, b) => {
+    if (a.type === "event" && b.type === "event")
+      return compareEvents(a.event, b.event);
+    const allDayA = a.type === "event" && a.event.allDay;
+    const allDayB = b.type === "event" && b.event.allDay;
+    if (allDayA !== allDayB) return allDayA ? -1 : 1;
+    return (a.start ?? "").localeCompare(b.start ?? "");
+  });
+}
+
+export default function Calendar({ user }: { user: User }) {
   const kind = useCalendarKind();
   const { events, error } = useEvents(kind);
+  const { timetables } = useMyTimetables();
   const today = useToday();
 
   // null の間は「今日」を基準にする
@@ -43,6 +72,8 @@ export default function Calendar() {
   // 起動時に「本日の予定」を表示する
   const [showToday, setShowToday] = useState(true);
   const closeToday = useCallback(() => setShowToday(false), []);
+  const [showTimetables, setShowTimetables] = useState(false);
+  const closeTimetables = useCallback(() => setShowTimetables(false), []);
 
   const eventsByDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
@@ -51,7 +82,6 @@ export default function Calendar() {
       list.push(e);
       map.set(e.date, list);
     }
-    for (const list of map.values()) list.sort(compareEvents);
     return map;
   }, [events]);
 
@@ -72,10 +102,13 @@ export default function Calendar() {
     <header className="border-b border-zinc-200 bg-white px-4 py-2 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mx-auto flex max-w-6xl items-center gap-2">
         <AppMenu
+          user={user}
           kind={kind}
           onSelectKind={setCalendarKind}
           onShowToday={() => setShowToday(true)}
           onGoToday={goToday}
+          onOpenTimetables={() => setShowTimetables(true)}
+          onLogout={() => void logout()}
         />
         <h1 className="hidden shrink-0 text-lg font-bold sm:block">
           キズナテック カレンダー
@@ -105,7 +138,36 @@ export default function Calendar() {
   };
   const selectedKey = selected ?? today;
   const days = monthGrid(year, month);
-  const selectedEvents = eventsByDate.get(selectedKey) ?? [];
+
+  // 時間割の授業は個人カレンダーに表示する (表示中の月 + 選択日 + 今日の分だけ展開)
+  const classesByDate = new Map<string, ClassOccurrence[]>();
+  const addClasses = (from: string, to: string) => {
+    for (const c of expandTimetables(timetables ?? [], from, to)) {
+      if (classesByDate.get(c.date)?.some((x) => x.id === c.id)) continue;
+      classesByDate.set(c.date, [...(classesByDate.get(c.date) ?? []), c]);
+    }
+  };
+  addClasses(toDateKey(days[0]), toDateKey(days[days.length - 1]));
+  addClasses(selectedKey, selectedKey);
+  addClasses(today, today);
+  const todayClasses = classesByDate.get(today) ?? [];
+
+  const itemsFor = (key: string): DayItem[] =>
+    sortItems([
+      ...(eventsByDate.get(key) ?? []).map(
+        (event): DayItem => ({
+          type: "event",
+          key: event.id,
+          start: event.start,
+          event,
+        }),
+      ),
+      ...(kind === "personal" ? (classesByDate.get(key) ?? []) : []).map(
+        (cls): DayItem => ({ type: "class", key: cls.id, start: cls.start, cls }),
+      ),
+    ]);
+
+  const selectedItems = itemsFor(selectedKey);
 
   const moveMonth = (delta: number) => {
     const d = new Date(year, month + delta, 1);
@@ -128,227 +190,288 @@ export default function Calendar() {
 
   return (
     <>
-    {header}
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 p-4">
-      {/* カレンダーの切り替え */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div
-          role="tablist"
-          aria-label="表示するカレンダー"
-          className="inline-flex rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-950"
-        >
-          {(["shared", "personal"] as CalendarKind[]).map((k) => (
-            <button
-              key={k}
-              role="tab"
-              aria-selected={kind === k}
-              onClick={() => setCalendarKind(k)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-                kind === k
-                  ? "bg-blue-600 text-white"
-                  : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-              }`}
-            >
-              {CALENDAR_LABELS[k]}カレンダー
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-zinc-500">
-          {kind === "shared"
-            ? "みんなで共有する予定です。追加・変更は全員に表示されます。"
-            : "自分だけの予定です。このブラウザにのみ保存されます。"}
-        </p>
-      </div>
-
-      {error && (
-        <p
-          role="alert"
-          className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300"
-        >
-          {error}
-        </p>
-      )}
-
-      <div className="flex flex-1 flex-col gap-4 lg:flex-row">
-      {/* 月表示 */}
-      <section className="flex flex-1 flex-col rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <header className="flex items-center gap-2 border-b border-zinc-200 p-3 dark:border-zinc-800">
-          <h2 className="mr-auto text-xl font-semibold tabular-nums">
-            {year}年{month + 1}月
-            {!events && (
-              <span className="ml-2 text-sm font-normal text-zinc-500">
-                読み込み中…
-              </span>
-            )}
-          </h2>
-          <button
-            onClick={goToday}
-            className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+      {header}
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 p-4">
+        {/* カレンダーの切り替え */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div
+            role="tablist"
+            aria-label="表示するカレンダー"
+            className="inline-flex rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-950"
           >
-            今日
-          </button>
-          <button
-            onClick={() => moveMonth(-1)}
-            aria-label="前の月"
-            className="rounded-lg px-2.5 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => moveMonth(1)}
-            aria-label="次の月"
-            className="rounded-lg px-2.5 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-          >
-            ›
-          </button>
-        </header>
-
-        <div className="grid grid-cols-7 border-b border-zinc-200 text-center text-xs font-medium dark:border-zinc-800">
-          {WEEKDAYS.map((w, i) => (
-            <div
-              key={w}
-              className={`py-2 ${
-                i === 0
-                  ? "text-rose-600"
-                  : i === 6
-                    ? "text-blue-600"
-                    : "text-zinc-500"
-              }`}
-            >
-              {w}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid flex-1 grid-cols-7 grid-rows-6">
-          {days.map((d) => {
-            const key = toDateKey(d);
-            const inMonth = d.getMonth() === month;
-            const isToday = key === today;
-            const isSelected = key === selectedKey;
-            const dayEvents = eventsByDate.get(key) ?? [];
-            const dow = d.getDay();
-
-            return (
+            {(["shared", "personal"] as CalendarKind[]).map((k) => (
               <button
-                key={key}
-                onClick={() => setSelected(key)}
-                onDoubleClick={() => events && openNew(key)}
-                aria-label={`${formatLongDate(key)}、予定${dayEvents.length}件`}
-                aria-pressed={isSelected}
-                className={`flex min-h-20 flex-col items-stretch gap-1 border-b border-r border-zinc-100 p-1 text-left transition-colors dark:border-zinc-900 sm:min-h-24 ${
-                  isSelected
-                    ? "bg-blue-50 dark:bg-blue-500/10"
-                    : "hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                } ${inMonth ? "" : "opacity-40"}`}
+                key={k}
+                role="tab"
+                aria-selected={kind === k}
+                onClick={() => setCalendarKind(k)}
+                className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+                  kind === k
+                    ? "bg-blue-600 text-white"
+                    : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                }`}
               >
-                <span
-                  className={`flex size-6 items-center justify-center self-start rounded-full text-xs tabular-nums ${
-                    isToday
-                      ? "bg-blue-600 font-semibold text-white"
-                      : dow === 0
-                        ? "text-rose-600"
-                        : dow === 6
-                          ? "text-blue-600"
-                          : ""
-                  }`}
-                >
-                  {d.getDate()}
-                </span>
-                {dayEvents.slice(0, MAX_CHIPS).map((e) => (
-                  <span
-                    key={e.id}
-                    className={`truncate rounded px-1 text-[11px] leading-5 ${COLORS[e.color].chip}`}
-                  >
-                    <span className="hidden sm:inline">
-                      {!e.allDay && e.start ? `${e.start} ` : ""}
-                    </span>
-                    {e.title}
-                  </span>
-                ))}
-                {dayEvents.length > MAX_CHIPS && (
-                  <span className="px-1 text-[11px] text-zinc-500">
-                    他{dayEvents.length - MAX_CHIPS}件
-                  </span>
-                )}
+                {CALENDAR_LABELS[k]}カレンダー
               </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 選択日の予定 */}
-      <aside className="flex w-full flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950 lg:w-80">
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <p className="text-xs text-zinc-500">
-              {CALENDAR_LABELS[kind]}カレンダー
-            </p>
-            <h3 className="font-semibold">{formatLongDate(selectedKey)}</h3>
-          </div>
-          <button
-            onClick={() => openNew(selectedKey)}
-            disabled={!events}
-            className="rounded-lg disabled:opacity-50 bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            ＋ 追加
-          </button>
-        </div>
-
-        {selectedEvents.length === 0 ? (
-          <p className="py-6 text-center text-sm text-zinc-500">
-            予定はありません
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {selectedEvents.map((e) => (
-              <li key={e.id}>
-                <button
-                  onClick={() => setEditing({ event: e, isNew: false })}
-                  className="flex w-full items-start gap-3 rounded-xl p-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                >
-                  <span
-                    className={`mt-1.5 size-2.5 shrink-0 rounded-full ${COLORS[e.color].dot}`}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-medium">
-                      {e.title}
-                    </span>
-                    <span className="block text-xs text-zinc-500 tabular-nums">
-                      {e.allDay
-                        ? "終日"
-                        : `${e.start ?? ""}${e.end ? ` 〜 ${e.end}` : ""}`}
-                    </span>
-                    {e.memo && (
-                      <span className="mt-1 block whitespace-pre-wrap text-xs text-zinc-600 dark:text-zinc-400">
-                        {e.memo}
-                      </span>
-                    )}
-                  </span>
-                </button>
-              </li>
             ))}
-          </ul>
+          </div>
+          <p className="text-xs text-zinc-500">
+            {kind === "shared"
+              ? "みんなで共有する予定です。追加・変更は全員に表示されます。"
+              : "自分だけの予定と、時間割の授業です。予定はこのブラウザに保存されます。"}
+          </p>
+        </div>
+
+        {error && (
+          <p
+            role="alert"
+            className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300"
+          >
+            {error}
+          </p>
         )}
 
-        <p className="mt-auto text-xs text-zinc-400">
-          日付をダブルクリックでも予定を追加できます。
-        </p>
-      </aside>
+        <div className="flex flex-1 flex-col gap-4 lg:flex-row">
+          {/* 月表示 */}
+          <section className="flex flex-1 flex-col rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+            <header className="flex items-center gap-2 border-b border-zinc-200 p-3 dark:border-zinc-800">
+              <h2 className="mr-auto text-xl font-semibold tabular-nums">
+                {year}年{month + 1}月
+                {!events && (
+                  <span className="ml-2 text-sm font-normal text-zinc-500">
+                    読み込み中…
+                  </span>
+                )}
+              </h2>
+              <button
+                onClick={goToday}
+                className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              >
+                今日
+              </button>
+              <button
+                onClick={() => moveMonth(-1)}
+                aria-label="前の月"
+                className="rounded-lg px-2.5 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                ‹
+              </button>
+              <button
+                onClick={() => moveMonth(1)}
+                aria-label="次の月"
+                className="rounded-lg px-2.5 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                ›
+              </button>
+            </header>
+
+            <div className="grid grid-cols-7 border-b border-zinc-200 text-center text-xs font-medium dark:border-zinc-800">
+              {WEEKDAYS.map((w, i) => (
+                <div
+                  key={w}
+                  className={`py-2 ${
+                    i === 0
+                      ? "text-rose-600"
+                      : i === 6
+                        ? "text-blue-600"
+                        : "text-zinc-500"
+                  }`}
+                >
+                  {w}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid flex-1 grid-cols-7 grid-rows-6">
+              {days.map((d) => {
+                const key = toDateKey(d);
+                const inMonth = d.getMonth() === month;
+                const isToday = key === today;
+                const isSelected = key === selectedKey;
+                const items = itemsFor(key);
+                const dow = d.getDay();
+
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setSelected(key)}
+                    onDoubleClick={() => events && openNew(key)}
+                    aria-label={`${formatLongDate(key)}、予定${items.length}件`}
+                    aria-pressed={isSelected}
+                    className={`flex min-h-20 flex-col items-stretch gap-1 border-r border-b border-zinc-100 p-1 text-left transition-colors sm:min-h-24 dark:border-zinc-900 ${
+                      isSelected
+                        ? "bg-blue-50 dark:bg-blue-500/10"
+                        : "hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                    } ${inMonth ? "" : "opacity-40"}`}
+                  >
+                    <span
+                      className={`flex size-6 items-center justify-center self-start rounded-full text-xs tabular-nums ${
+                        isToday
+                          ? "bg-blue-600 font-semibold text-white"
+                          : dow === 0
+                            ? "text-rose-600"
+                            : dow === 6
+                              ? "text-blue-600"
+                              : ""
+                      }`}
+                    >
+                      {d.getDate()}
+                    </span>
+                    {items.slice(0, MAX_CHIPS).map((item) => (
+                      <span
+                        key={item.key}
+                        className={`truncate rounded px-1 text-[11px] leading-5 ${COLORS[itemColor(item)].chip} ${
+                          item.type === "class"
+                            ? "border-l-2 border-current/40"
+                            : ""
+                        }`}
+                      >
+                        <span className="hidden sm:inline">
+                          {item.start &&
+                          !(item.type === "event" && item.event.allDay)
+                            ? `${item.start} `
+                            : ""}
+                        </span>
+                        {itemTitle(item)}
+                      </span>
+                    ))}
+                    {items.length > MAX_CHIPS && (
+                      <span className="px-1 text-[11px] text-zinc-500">
+                        他{items.length - MAX_CHIPS}件
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* 選択日の予定 */}
+          <aside className="flex w-full flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 lg:w-80 dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <p className="text-xs text-zinc-500">
+                  {CALENDAR_LABELS[kind]}カレンダー
+                </p>
+                <h3 className="font-semibold">{formatLongDate(selectedKey)}</h3>
+              </div>
+              <button
+                onClick={() => openNew(selectedKey)}
+                disabled={!events}
+                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                ＋ 追加
+              </button>
+            </div>
+
+            {selectedItems.length === 0 ? (
+              <p className="py-6 text-center text-sm text-zinc-500">
+                予定はありません
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {selectedItems.map((item) =>
+                  item.type === "event" ? (
+                    <li key={item.key}>
+                      <button
+                        onClick={() =>
+                          setEditing({ event: item.event, isNew: false })
+                        }
+                        className="flex w-full items-start gap-3 rounded-xl p-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                      >
+                        <EventSummary event={item.event} />
+                      </button>
+                    </li>
+                  ) : (
+                    <li key={item.key}>
+                      <button
+                        onClick={() => setShowTimetables(true)}
+                        className="flex w-full items-start gap-3 rounded-xl p-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                      >
+                        <ClassSummary cls={item.cls} />
+                      </button>
+                    </li>
+                  ),
+                )}
+              </ul>
+            )}
+
+            <p className="mt-auto text-xs text-zinc-400">
+              日付をダブルクリックでも予定を追加できます。
+              {kind === "personal" &&
+                "時間割はメニューの「時間割」から作成・表示できます。"}
+            </p>
+          </aside>
+        </div>
+
+        {showToday && (
+          <TodayDialog
+            today={today}
+            classes={timetables ? todayClasses : null}
+            onClose={closeToday}
+          />
+        )}
+
+        {showTimetables && (
+          <TimetableManager today={today} onClose={closeTimetables} />
+        )}
+
+        {editing && (
+          <EventDialog
+            key={`${kind}:${editing.event.id}`}
+            kind={kind}
+            event={editing.event}
+            isNew={editing.isNew}
+            onClose={closeDialog}
+          />
+        )}
       </div>
+    </>
+  );
+}
 
-      {showToday && <TodayDialog today={today} onClose={closeToday} />}
+function EventSummary({ event: e }: { event: CalendarEvent }) {
+  return (
+    <>
+      <span
+        className={`mt-1.5 size-2.5 shrink-0 rounded-full ${COLORS[e.color].dot}`}
+      />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-medium">{e.title}</span>
+        <span className="block text-xs text-zinc-500 tabular-nums">
+          {e.allDay ? "終日" : `${e.start ?? ""}${e.end ? ` 〜 ${e.end}` : ""}`}
+        </span>
+        {e.memo && (
+          <span className="mt-1 block text-xs whitespace-pre-wrap text-zinc-600 dark:text-zinc-400">
+            {e.memo}
+          </span>
+        )}
+      </span>
+    </>
+  );
+}
 
-      {editing && (
-        <EventDialog
-          key={`${kind}:${editing.event.id}`}
-          kind={kind}
-          event={editing.event}
-          isNew={editing.isNew}
-          onClose={closeDialog}
-        />
-      )}
-    </div>
+export function ClassSummary({ cls: c }: { cls: ClassOccurrence }) {
+  return (
+    <>
+      <span
+        className={`mt-1.5 size-2.5 shrink-0 rounded-sm ${COLORS[c.color].dot}`}
+      />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-medium">{c.subject}</span>
+        <span className="block text-xs text-zinc-500 tabular-nums">
+          {c.start} 〜 {c.end}
+          {c.room ? `・${c.room}` : ""}
+        </span>
+        <span className="block truncate text-xs text-zinc-400">
+          時間割：{c.timetableTitle}
+        </span>
+        {c.memo && (
+          <span className="mt-1 block text-xs whitespace-pre-wrap text-zinc-600 dark:text-zinc-400">
+            {c.memo}
+          </span>
+        )}
+      </span>
     </>
   );
 }

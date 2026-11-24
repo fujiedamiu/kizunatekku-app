@@ -1,53 +1,28 @@
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { parseEvent, type CalendarEvent } from "./calendar";
+import { readData, updateData } from "./server/db";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "shared-events.json");
+const NAME = "shared-events";
 
-async function load(): Promise<CalendarEvent[]> {
-  try {
-    const parsed: unknown = JSON.parse(await readFile(DATA_FILE, "utf8"));
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map(parseEvent).filter((e) => e !== null);
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === "ENOENT") return [];
-    throw err;
-  }
-}
+const clean = (raw: unknown): CalendarEvent[] =>
+  Array.isArray(raw) ? raw.map(parseEvent).filter((e) => e !== null) : [];
 
-async function save(events: CalendarEvent[]) {
-  await mkdir(DATA_DIR, { recursive: true });
-  const tmp = `${DATA_FILE}.${process.pid}.tmp`;
-  await writeFile(tmp, JSON.stringify(events, null, 2), "utf8");
-  await rename(tmp, DATA_FILE);
-}
-
-// 同時に届いた更新で書き込みが競合しないよう、変更は 1 件ずつ順番に処理する
-let queue: Promise<unknown> = Promise.resolve();
-
-function mutate(fn: (events: CalendarEvent[]) => CalendarEvent[]) {
-  const next = queue.then(async () => {
-    const events = fn(await load());
-    await save(events);
-    return events;
-  });
-  queue = next.catch(() => {});
-  return next;
-}
-
-export function listSharedEvents() {
-  return queue.then(load, load);
+export async function listSharedEvents() {
+  return clean(await readData<unknown>(NAME, []));
 }
 
 export function upsertSharedEvent(event: CalendarEvent) {
-  return mutate((events) =>
-    events.some((e) => e.id === event.id)
+  return updateData<unknown, CalendarEvent[]>(NAME, [], (raw) => {
+    const events = clean(raw);
+    const value = events.some((e) => e.id === event.id)
       ? events.map((e) => (e.id === event.id ? event : e))
-      : [...events, event],
-  );
+      : [...events, event];
+    return { value, result: value };
+  });
 }
 
 export function deleteSharedEvent(id: string) {
-  return mutate((events) => events.filter((e) => e.id !== id));
+  return updateData<unknown, CalendarEvent[]>(NAME, [], (raw) => {
+    const value = clean(raw).filter((e) => e.id !== id);
+    return { value, result: value };
+  });
 }

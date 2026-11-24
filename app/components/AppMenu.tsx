@@ -2,22 +2,29 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CALENDAR_LABELS, type CalendarKind } from "@/lib/events-store";
+import type { User } from "@/lib/user";
 
 type Props = {
+  user: User;
   kind: CalendarKind;
   onSelectKind: (kind: CalendarKind) => void;
   onShowToday: () => void;
   onGoToday: () => void;
+  onOpenTimetables: () => void;
+  onLogout: () => void;
 };
 
 const KINDS: CalendarKind[] = ["shared", "personal"];
 
 /** ヘッダー左上のメニューボタンと、左から開くメニュー */
 export default function AppMenu({
+  user,
   kind,
   onSelectKind,
   onShowToday,
   onGoToday,
+  onOpenTimetables,
+  onLogout,
 }: Props) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -124,6 +131,34 @@ export default function AppMenu({
               <button onClick={choose(onGoToday)} className={itemClass()}>
                 <span aria-hidden="true">📅</span>
                 今日の日付に移動
+              </button>
+            </section>
+
+            <section className="space-y-1">
+              <h2 className="px-3 text-xs font-semibold text-zinc-500">
+                時間割
+              </h2>
+              <button onClick={choose(onOpenTimetables)} className={itemClass()}>
+                <span aria-hidden="true">📚</span>
+                時間割の作成・検索
+              </button>
+            </section>
+
+            <section className="mt-auto space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+              <div className="px-3">
+                <p className="truncate font-medium">{user.name}</p>
+                <p className="text-xs text-zinc-500 tabular-nums">
+                  {user.studentId}
+                </p>
+              </div>
+              <button
+                onClick={choose(() => {
+                  if (window.confirm("ログアウトしますか？")) onLogout();
+                })}
+                className={itemClass()}
+              >
+                <span aria-hidden="true">🚪</span>
+                ログアウト
               </button>
             </section>
           </nav>

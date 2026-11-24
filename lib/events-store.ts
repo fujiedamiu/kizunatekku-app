@@ -43,11 +43,35 @@ const upsert = (events: CalendarEvent[], event: CalendarEvent) =>
 // 個人カレンダー: localStorage に保存
 // ---------------------------------------------------------------------------
 
-const PERSONAL_KEY = "kizunatekku.events.v1";
+/** ログイン前に保存されていた予定 (最初にログインした人の個人カレンダーへ移す) */
+const LEGACY_PERSONAL_KEY = "kizunatekku.events.v1";
+let PERSONAL_KEY = LEGACY_PERSONAL_KEY;
+let resetPersonal: () => void = () => {};
+
+/** 個人カレンダーをログイン中のユーザーごとに分けて保存する */
+export function setEventsUser(studentId: string) {
+  const key = `kizunatekku.events.v2:${studentId}`;
+  if (key === PERSONAL_KEY) return;
+  try {
+    const legacy = window.localStorage.getItem(LEGACY_PERSONAL_KEY);
+    if (legacy !== null && window.localStorage.getItem(key) === null) {
+      window.localStorage.setItem(key, legacy);
+      window.localStorage.removeItem(LEGACY_PERSONAL_KEY);
+    }
+  } catch {
+    // 移せなくても新しいキーで続ける
+  }
+  PERSONAL_KEY = key;
+  resetPersonal();
+}
 
 function createPersonalStore(): Store {
   let state: EventsState | null = null;
   const listeners = createListeners();
+  resetPersonal = () => {
+    state = null;
+    listeners.notify();
+  };
 
   const read = (): EventsState => {
     if (state) return state;

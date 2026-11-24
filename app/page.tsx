@@ -1,9 +1,9 @@
-import Calendar from "./components/Calendar";
+import AuthGate from "./components/AuthGate";
 
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col bg-zinc-50 dark:bg-black">
-      <Calendar />
+      <AuthGate />
     </div>
   );
 }
