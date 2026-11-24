@@ -6,14 +6,12 @@ import {
   findUser,
   startSession,
 } from "@/lib/server/auth";
+import { apiError } from "@/lib/server/http";
 import {
   normalizeStudentId,
   validateName,
   validateStudentId,
 } from "@/lib/user";
-
-const bad = (error: string, status = 400) =>
-  Response.json({ error }, { status });
 
 /** ログイン中のユーザー */
 export async function GET() {
@@ -34,38 +32,30 @@ export async function POST(request: Request) {
     studentId?: unknown;
     name?: unknown;
   } | null;
-  if (!body) return bad("内容が不正です");
+  if (!body) return apiError("invalid", 400);
 
   const studentId = normalizeStudentId(String(body.studentId ?? ""));
   const idError = validateStudentId(studentId);
-  if (idError) return bad(idError);
+  if (idError) return apiError(idError.code, 400, idError.params);
 
   if (body.mode === "register") {
     const name = String(body.name ?? "").trim();
     const nameError = validateName(name);
-    if (nameError) return bad(nameError);
+    if (nameError) return apiError(nameError.code, 400, nameError.params);
     const user = await createUser({ studentId, name });
-    if (!user)
-      return bad(
-        "この学籍番号はすでに登録されています。「ログイン」から入ってください。",
-        409,
-      );
+    if (!user) return apiError("studentIdTaken", 409);
     await startSession(studentId);
     return Response.json({ user });
   }
 
   if (body.mode === "login") {
     const user = await findUser(studentId);
-    if (!user)
-      return bad(
-        "この学籍番号は登録されていません。初めての方は「新規登録」から登録してください。",
-        404,
-      );
+    if (!user) return apiError("studentIdNotFound", 404);
     await startSession(studentId);
     return Response.json({ user });
   }
 
-  return bad("内容が不正です");
+  return apiError("invalid", 400);
 }
 
 /** ログアウト */

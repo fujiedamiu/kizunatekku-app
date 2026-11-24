@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { COLORS, WEEKDAYS, type EventColor } from "@/lib/calendar";
+import { COLORS, type EventColor } from "@/lib/calendar";
+import { describeError, errorMessage } from "@/lib/errors";
+import { useI18n } from "@/lib/i18n";
 import {
   DEFAULT_PERIODS,
   MAX_PERIODS,
@@ -44,6 +46,7 @@ export default function TimetableEditor({
   initial,
   onDone,
 }: Props) {
+  const { t, weekdayLong } = useI18n();
   const [draft, setDraft] = useState<TimetableInput>(initial);
   const [cell, setCell] = useState<Cell | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +89,7 @@ export default function TimetableEditor({
   const handleSave = async () => {
     const parsed = parseTimetableInput(draft);
     if (!parsed.ok) {
-      setError(parsed.error);
+      setError(errorMessage(t, parsed.error.code, parsed.error.params));
       return;
     }
     setBusy(true);
@@ -96,7 +99,7 @@ export default function TimetableEditor({
       else await createTimetable(parsed.value);
       onDone();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "保存できませんでした");
+      setError(describeError(t, e, "saveFailed"));
       setBusy(false);
     }
   };
@@ -105,23 +108,23 @@ export default function TimetableEditor({
     <div className="space-y-5">
       <label className="block space-y-1">
         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-          時間割の名前（検索でこの名前がヒットします）
+          {t("tte.name")}
         </span>
         <input
           autoFocus
           className={inputClass}
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-          placeholder="例：情報工学科 2年 前期"
+          placeholder={t("tte.namePlaceholder")}
         />
       </label>
 
       <div className="space-y-1">
-        <span className="text-sm text-zinc-600 dark:text-zinc-400">期間</span>
+        <span className="text-sm text-zinc-600 dark:text-zinc-400">{t("tte.term")}</span>
         <div className="flex items-center gap-2">
           <input
             type="date"
-            aria-label="開始日"
+            aria-label={t("tte.startDate")}
             className={inputClass}
             value={draft.startDate}
             onChange={(e) => setDraft({ ...draft, startDate: e.target.value })}
@@ -129,7 +132,7 @@ export default function TimetableEditor({
           <span className="text-zinc-500">〜</span>
           <input
             type="date"
-            aria-label="終了日"
+            aria-label={t("tte.endDate")}
             className={inputClass}
             value={draft.endDate}
             onChange={(e) => setDraft({ ...draft, endDate: e.target.value })}
@@ -139,15 +142,15 @@ export default function TimetableEditor({
 
       <div className="space-y-2">
         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-          時限と時刻
+          {t("tte.periodsHeading")}
         </span>
         <ul className="grid gap-2 sm:grid-cols-2">
           {draft.periods.map((p, i) => (
             <li key={i} className="flex items-center gap-2">
-              <span className="w-9 shrink-0 text-sm font-medium">{i + 1}限</span>
+              <span className="w-9 shrink-0 text-sm font-medium">{t("tte.period", { n: i + 1 })}</span>
               <input
                 type="time"
-                aria-label={`${i + 1}限の開始時刻`}
+                aria-label={t("tte.periodStart", { n: i + 1 })}
                 className={inputClass}
                 value={p.start}
                 onChange={(e) => setPeriod(i, { start: e.target.value })}
@@ -155,7 +158,7 @@ export default function TimetableEditor({
               <span className="text-zinc-500">〜</span>
               <input
                 type="time"
-                aria-label={`${i + 1}限の終了時刻`}
+                aria-label={t("tte.periodEnd", { n: i + 1 })}
                 className={inputClass}
                 value={p.end}
                 onChange={(e) => setPeriod(i, { end: e.target.value })}
@@ -170,7 +173,7 @@ export default function TimetableEditor({
             disabled={draft.periods.length >= MAX_PERIODS}
             className="rounded-lg border border-zinc-300 px-3 py-1 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
           >
-            ＋ 時限を追加
+            {t("tte.addPeriod")}
           </button>
           <button
             type="button"
@@ -178,14 +181,14 @@ export default function TimetableEditor({
             disabled={draft.periods.length <= 1}
             className="rounded-lg border border-zinc-300 px-3 py-1 text-sm hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
           >
-            − 最後の時限を削除
+            {t("tte.removePeriod")}
           </button>
         </div>
       </div>
 
       <div className="space-y-2">
         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-          授業（マスをクリックして入力）
+          {t("tte.classesHeading")}
         </span>
         <TimetableGrid
           periods={draft.periods}
@@ -197,7 +200,10 @@ export default function TimetableEditor({
       {cell && (
         <SlotForm
           key={`${cell.weekday}:${cell.period}`}
-          label={`${WEEKDAYS[cell.weekday]}曜 ${cell.period + 1}限`}
+          label={t("tte.slotHeading", {
+            day: weekdayLong(cell.weekday),
+            period: t("tte.period", { n: cell.period + 1 }),
+          })}
           slot={slotAt(cell.weekday, cell.period)}
           onSave={(slot) => {
             saveSlot(
@@ -222,7 +228,7 @@ export default function TimetableEditor({
           onClick={onDone}
           className="rounded-lg px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
         >
-          キャンセル
+          {t("common.cancel")}
         </button>
         <button
           type="button"
@@ -230,7 +236,7 @@ export default function TimetableEditor({
           disabled={busy}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {timetableId ? "保存" : "作成"}
+          {timetableId ? t("common.save") : t("tte.create")}
         </button>
       </div>
     </div>
@@ -247,6 +253,7 @@ export function TimetableGrid({
   slotAt: (weekday: number, period: number) => TimetableSlot | undefined;
   onCellClick?: (weekday: number, period: number) => void;
 }) {
+  const { t, weekdayShort, weekdayLong } = useI18n();
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[480px] table-fixed border-collapse text-xs">
@@ -258,7 +265,7 @@ export function TimetableGrid({
                 key={w}
                 className={`py-1 font-medium ${w === 6 ? "text-blue-600" : "text-zinc-500"}`}
               >
-                {WEEKDAYS[w]}
+                {weekdayShort(w)}
               </th>
             ))}
           </tr>
@@ -268,7 +275,7 @@ export function TimetableGrid({
             <tr key={i}>
               <th className="border-t border-zinc-100 py-1 pr-1 text-left align-top font-normal text-zinc-500 dark:border-zinc-800">
                 <span className="block font-medium text-zinc-700 dark:text-zinc-300">
-                  {i + 1}限
+                  {t("tte.period", { n: i + 1 })}
                 </span>
                 <span className="tabular-nums">{p.start}</span>
               </th>
@@ -299,7 +306,18 @@ export function TimetableGrid({
                       <button
                         type="button"
                         onClick={() => onCellClick(w, i)}
-                        aria-label={`${WEEKDAYS[w]}曜 ${i + 1}限${slot ? `：${slot.subject}` : "（空き）"}`}
+                        aria-label={
+                          slot
+                            ? t("tte.cell", {
+                                day: weekdayLong(w),
+                                period: t("tte.period", { n: i + 1 }),
+                                subject: slot.subject,
+                              })
+                            : t("tte.cellEmpty", {
+                                day: weekdayLong(w),
+                                period: t("tte.period", { n: i + 1 }),
+                              })
+                        }
                         className="h-full w-full rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800"
                       >
                         {content}
@@ -330,6 +348,7 @@ function SlotForm({
   onSave: (slot: TimetableSlot | null) => void;
   onCancel: () => void;
 }) {
+  const { t } = useI18n();
   const [subject, setSubject] = useState(slot?.subject ?? "");
   const [color, setColor] = useState<EventColor>(slot?.color ?? "blue");
   const [room, setRoom] = useState(slot?.room ?? "");
@@ -338,7 +357,7 @@ function SlotForm({
 
   const submit = () => {
     if (!subject.trim()) {
-      setError("科目名を入力してください");
+      setError(t("err.subjectRequired"));
       return;
     }
     onSave({
@@ -366,30 +385,30 @@ function SlotForm({
             submit();
           }
         }}
-        placeholder="科目名（例：線形代数）"
-        aria-label="科目名"
+        placeholder={t("tte.subjectPlaceholder")}
+        aria-label={t("tte.subject")}
       />
       <input
         className={inputClass}
         value={room}
         onChange={(e) => setRoom(e.target.value)}
-        placeholder="教室（任意）"
-        aria-label="教室"
+        placeholder={t("tte.roomPlaceholder")}
+        aria-label={t("tte.room")}
       />
       <textarea
         rows={2}
         className={inputClass}
         value={memo}
         onChange={(e) => setMemo(e.target.value)}
-        placeholder="メモ（任意）"
-        aria-label="メモ"
+        placeholder={t("tte.memoPlaceholder")}
+        aria-label={t("event.memo")}
       />
-      <div className="flex gap-2" role="group" aria-label="色">
+      <div className="flex gap-2" role="group" aria-label={t("event.color")}>
         {(Object.keys(COLORS) as EventColor[]).map((c) => (
           <button
             key={c}
             type="button"
-            aria-label={COLORS[c].label}
+            aria-label={t(`color.${c}`)}
             aria-pressed={color === c}
             onClick={() => setColor(c)}
             className={`size-7 rounded-full ${COLORS[c].dot} ${
@@ -408,7 +427,7 @@ function SlotForm({
             onClick={() => onSave(null)}
             className="rounded-lg px-3 py-1.5 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10"
           >
-            このコマを空にする
+            {t("tte.clearSlot")}
           </button>
         )}
         <div className="ml-auto flex gap-2">
@@ -417,7 +436,7 @@ function SlotForm({
             onClick={onCancel}
             className="rounded-lg px-3 py-1.5 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
-            キャンセル
+            {t("common.cancel")}
           </button>
           <button
             type="button"

@@ -1,3 +1,5 @@
+import type { Translate } from "./i18n/core";
+
 export type EventColor = "blue" | "green" | "red" | "amber" | "purple";
 
 export type CalendarEvent = {
@@ -12,7 +14,18 @@ export type CalendarEvent = {
   end?: string;
   color: EventColor;
   memo?: string;
+  /** 開始の何分前に通知するか。未設定なら通知しない (時刻のある予定のみ) */
+  notifyBefore?: number;
 };
+
+/** 通知のタイミングの選択肢 (分) */
+export const NOTIFY_OPTIONS = [5, 10, 15, 30, 60, 120, 1440] as const;
+
+export function formatNotifyBefore(minutes: number, t: Translate): string {
+  if (minutes % 1440 === 0) return t("notify.days", { n: minutes / 1440 });
+  if (minutes % 60 === 0) return t("notify.hours", { n: minutes / 60 });
+  return t("notify.minutes", { n: minutes });
+}
 
 export const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"] as const;
 
@@ -107,5 +120,13 @@ export function parseEvent(value: unknown): CalendarEvent | null {
     end: v.allDay ? undefined : time(v.end),
     color: v.color as EventColor,
     memo: memo || undefined,
+    notifyBefore:
+      !v.allDay &&
+      typeof v.notifyBefore === "number" &&
+      Number.isInteger(v.notifyBefore) &&
+      v.notifyBefore > 0 &&
+      v.notifyBefore <= 10080
+        ? v.notifyBefore
+        : undefined,
   };
 }

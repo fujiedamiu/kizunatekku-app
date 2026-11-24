@@ -1,0 +1,211 @@
+import type { Messages } from "./ja";
+
+const id: Messages = {
+  "app.title": "Kalender Kizunatech",
+  "common.loading": "Memuat…",
+  "common.close": "Tutup",
+  "common.cancel": "Batal",
+  "common.save": "Simpan",
+  "common.delete": "Hapus",
+  "common.ok": "OK",
+  "common.add": "＋ Tambah",
+  "common.today": "Hari ini",
+  "common.allDay": "Sepanjang hari",
+  "common.noEvents": "Tidak ada acara",
+  "common.searching": "Mencari…",
+
+  "calendar.shared": "Kalender bersama",
+  "calendar.personal": "Kalender pribadi",
+  "calendar.sharedShort": "Bersama",
+  "calendar.personalShort": "Pribadi",
+  "calendar.switcherLabel": "Kalender yang ditampilkan",
+  "calendar.sharedDesc":
+    "Acara yang dibagikan dengan semua orang. Penambahan dan perubahan akan terlihat oleh semua pengguna.",
+  "calendar.personalDesc":
+    "Acara pribadi Anda dan kelas dari jadwal kuliah. Acara disimpan di browser ini.",
+  "calendar.prevMonth": "Bulan sebelumnya",
+  "calendar.nextMonth": "Bulan berikutnya",
+  "calendar.dayAria": "{date}, {n} acara",
+  "calendar.more": "{n} lainnya",
+  "calendar.hintDoubleClick":
+    "Anda juga bisa menambah acara dengan mengklik dua kali sebuah tanggal.",
+  "calendar.hintTimetable":
+    "Jadwal kuliah bisa dibuat dan ditampilkan dari “Jadwal Kuliah” di menu.",
+  "calendar.notifyOn": "Pengingat aktif",
+  "calendar.timetableLabel": "Jadwal kuliah: {title}",
+
+  "menu.open": "Buka menu",
+  "menu.close": "Tutup menu",
+  "menu.title": "Menu",
+  "menu.calendars": "Kalender",
+  "menu.view": "Tampilan",
+  "menu.todaySchedule": "Jadwal hari ini",
+  "menu.goToday": "Ke tanggal hari ini",
+  "menu.timetable": "Jadwal Kuliah",
+  "menu.timetableManage": "Buat / cari jadwal kuliah",
+  "menu.settings": "Pengaturan",
+  "menu.language": "Bahasa",
+  "menu.logout": "Keluar",
+  "menu.logoutConfirm": "Keluar dari akun?",
+
+  "event.addTitle": "Tambah acara",
+  "event.editTitle": "Edit acara",
+  "event.title": "Judul",
+  "event.titlePlaceholder": "Contoh: Rapat",
+  "event.date": "Tanggal",
+  "event.startTime": "Waktu mulai",
+  "event.endTime": "Waktu selesai",
+  "event.color": "Warna",
+  "event.memo": "Catatan",
+  "event.notify": "Pengingat",
+  "event.notifyAllDay":
+    "Pengingat tidak bisa diatur untuk acara sepanjang hari (atur waktu mulai agar bisa diaktifkan).",
+  "event.notifyEnable": "Ingatkan saya",
+  "event.notifyWhen": "Berapa lama sebelumnya diingatkan",
+  "event.notifyUnsupported":
+    "Browser ini tidak mendukung notifikasi, jadi pengingat hanya muncul di dalam aplikasi.",
+  "event.notifyDenied":
+    "Notifikasi browser tidak diizinkan, jadi pengingat hanya muncul di dalam aplikasi. Anda bisa mengizinkan notifikasi di pengaturan browser.",
+  "event.notifyNote":
+    "※ Pengingat muncul selama aplikasi ini terbuka (meskipun Anda sedang membuka tab lain).",
+  "event.notifyNoteShared":
+    "Pengingat untuk acara di kalender bersama dikirim ke semua orang yang sedang membuka aplikasi.",
+  "event.deleteConfirm": "Hapus “{title}”?",
+
+  "notify.minutes": "{n} menit sebelumnya",
+  "notify.hours": "{n} jam sebelumnya",
+  "notify.days": "{n} hari sebelumnya",
+  "reminder.inMinutes": "{n} menit lagi",
+  "reminder.inHours": "{h} jam lagi",
+  "reminder.inHoursMinutes": "{h} jam {m} menit lagi",
+  "reminder.title": "{left}: {title}",
+  "reminder.body": "Mulai pukul {time}",
+  "reminder.dismiss": "Tutup pengingat",
+
+  "color.blue": "Biru",
+  "color.green": "Hijau",
+  "color.red": "Merah",
+  "color.amber": "Kuning",
+  "color.purple": "Ungu",
+
+  "today.title": "Jadwal hari ini",
+  "today.count": "{n} item",
+  "today.timetable": "Jadwal kuliah",
+  "today.noClasses": "Tidak ada kelas hari ini",
+
+  "search.label": "Cari acara",
+  "search.placeholder": "Cari acara (judul, catatan)",
+  "search.noResults": "Tidak ada acara yang cocok dengan “{q}”",
+  "search.results": "Hasil pencarian",
+  "search.more": "{n} lainnya. Tambahkan kata kunci untuk mempersempit hasil.",
+
+  "login.tabLogin": "Masuk",
+  "login.tabRegister": "Daftar (pengguna baru)",
+  "login.name": "Nama",
+  "login.namePlaceholder": "Contoh: Taro Yamada",
+  "login.studentId": "Nomor induk mahasiswa",
+  "login.studentIdAria": "Nomor induk mahasiswa (angka setelah {prefix})",
+  "login.studentIdNote":
+    "※ Awalan “{prefix}” pada nomor induk mahasiswa sudah terisi. Masukkan hanya angka setelah {prefix} dengan angka half-width (angka biasa 0–9, bukan angka lebar Jepang). (Contoh: M1234567 → 1234567)",
+  "login.submitRegister": "Daftar dan mulai",
+  "login.submitLogin": "Masuk",
+  "login.hintRegister":
+    "Selanjutnya, Anda bisa masuk hanya dengan nomor induk mahasiswa.",
+  "login.hintLogin":
+    "Baru pertama kali? Daftarkan nama dan nomor induk mahasiswa Anda melalui “Daftar”.",
+
+  "tt.title": "Jadwal Kuliah",
+  "tt.editTitle": "Edit jadwal kuliah",
+  "tt.newTitle": "Jadwal kuliah baru",
+  "tt.tabMine": "Jadwal saya",
+  "tt.tabSearch": "Cari jadwal kuliah",
+  "tt.ownedHeading": "Jadwal kuliah yang saya buat",
+  "tt.newButton": "＋ Jadwal kuliah baru",
+  "tt.noneOwned":
+    "Belum ada jadwal kuliah. Buat dari “＋ Jadwal kuliah baru”.",
+  "tt.edit": "Edit",
+  "tt.subscribedHeading": "Jadwal orang lain yang sedang ditampilkan",
+  "tt.noneSubscribed":
+    "Anda bisa menampilkan jadwal kuliah orang lain dari “Cari jadwal kuliah”.",
+  "tt.searchLabel": "Cari jadwal kuliah",
+  "tt.searchPlaceholder": "Cari berdasarkan nama jadwal, pembuat, atau mata kuliah",
+  "tt.searchIntro":
+    "Masukkan kata kunci untuk mencari jadwal kuliah yang dibuat oleh semua orang.",
+  "tt.searchNoResults": "Tidak ada jadwal kuliah yang cocok dengan “{q}”",
+  "tt.ownAlwaysShown": "Jadwal kuliah Anda (selalu ditampilkan)",
+  "tt.cardMeta": "Oleh {owner} · {start} – {end} · {n} kelas",
+  "tt.showContents": "Lihat isi",
+  "tt.subscribe": "Tampilkan di kalender saya",
+  "tt.unsubscribe": "Berhenti menampilkan",
+  "tt.deleteConfirm":
+    "Hapus “{title}”?\nJadwal ini juga akan hilang dari kalender orang lain yang menampilkannya.",
+
+  "tte.name": "Nama jadwal kuliah (nama ini muncul di pencarian)",
+  "tte.namePlaceholder": "Contoh: Teknik Informatika Tahun 2, Semester 1",
+  "tte.term": "Periode",
+  "tte.startDate": "Tanggal mulai",
+  "tte.endDate": "Tanggal selesai",
+  "tte.periodsHeading": "Jam pelajaran dan waktu",
+  "tte.period": "Jam ke-{n}",
+  "tte.periodStart": "Waktu mulai jam ke-{n}",
+  "tte.periodEnd": "Waktu selesai jam ke-{n}",
+  "tte.addPeriod": "＋ Tambah jam pelajaran",
+  "tte.removePeriod": "− Hapus jam pelajaran terakhir",
+  "tte.classesHeading": "Kelas (klik kotak untuk mengisi)",
+  "tte.create": "Buat",
+  "tte.cell": "{day} {period}: {subject}",
+  "tte.cellEmpty": "{day} {period} (kosong)",
+  "tte.slotHeading": "{day} {period}",
+  "tte.subject": "Mata kuliah",
+  "tte.subjectPlaceholder": "Mata kuliah (contoh: Aljabar Linear)",
+  "tte.room": "Ruang kelas",
+  "tte.roomPlaceholder": "Ruang kelas (opsional)",
+  "tte.memoPlaceholder": "Catatan (opsional)",
+  "tte.clearSlot": "Kosongkan kelas ini",
+
+  "lang.title": "Pilih bahasa",
+  "lang.intro":
+    "Pilih bahasa tampilan. Anda bisa mengubahnya nanti dari “Bahasa” di menu.",
+  "lang.searchPlaceholder": "Cari bahasa (contoh: English, 中文, 한국어)",
+  "lang.noResults": "Tidak ada bahasa yang cocok",
+
+  "err.generic": "Terjadi kesalahan",
+  "err.unauthorized": "Silakan masuk terlebih dahulu",
+  "err.invalid": "Data tidak valid",
+  "err.server": "Terjadi kesalahan server",
+  "err.studentIdTaken":
+    "Nomor induk mahasiswa ini sudah terdaftar. Silakan masuk melalui “Masuk”.",
+  "err.studentIdNotFound":
+    "Nomor induk mahasiswa ini belum terdaftar. Jika baru pertama kali, silakan daftar melalui “Daftar”.",
+  "err.forbidden": "Hanya pembuat yang dapat mengedit jadwal kuliah ini",
+  "err.notFound": "Jadwal kuliah tidak ditemukan",
+  "err.sharedLoad":
+    "Gagal memuat kalender bersama. Silakan periksa koneksi internet Anda.",
+  "err.timetablesLoad": "Gagal memuat jadwal kuliah",
+  "err.saveFailed": "Gagal menyimpan",
+  "err.deleteFailed": "Gagal menghapus",
+  "err.changeFailed": "Gagal mengubah",
+  "err.searchFailed": "Gagal mencari",
+  "err.studentIdRequired": "Silakan masukkan nomor induk mahasiswa",
+  "err.studentIdFullWidth":
+    "Masukkan angka dalam format half-width (angka biasa 0–9; angka full-width/lebar tidak bisa digunakan)",
+  "err.studentIdDigits":
+    "Masukkan hanya angka half-width (angka biasa 0–9) untuk nomor setelah {prefix}",
+  "err.studentIdTooLong": "Nomor terlalu panjang",
+  "err.studentIdPrefix": "Nomor induk mahasiswa harus diawali dengan {prefix}",
+  "err.nameRequired": "Silakan masukkan nama",
+  "err.nameTooLong": "Nama maksimal 50 karakter",
+  "err.eventTitleRequired": "Silakan masukkan judul",
+  "err.eventEndBeforeStart": "Waktu selesai harus setelah waktu mulai",
+  "err.ttTitleRequired": "Silakan masukkan nama jadwal kuliah",
+  "err.ttDatesRequired": "Silakan masukkan periode",
+  "err.ttEndBeforeStart": "Tanggal selesai periode harus setelah tanggal mulai",
+  "err.ttNoPeriods": "Atur setidaknya satu jam pelajaran",
+  "err.ttTooManyPeriods": "Maksimal {n} jam pelajaran",
+  "err.ttPeriodTime": "Silakan masukkan waktu jam ke-{n}",
+  "err.ttPeriodEndBeforeStart":
+    "Waktu selesai jam ke-{n} harus setelah waktu mulainya",
+  "err.subjectRequired": "Silakan masukkan mata kuliah",
+};
+
+export default id;

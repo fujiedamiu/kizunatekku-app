@@ -1,0 +1,211 @@
+import type { Messages } from "./ja";
+
+const ne: Messages = {
+  "app.title": "Kizunatech क्यालेन्डर",
+  "common.loading": "लोड हुँदैछ…",
+  "common.close": "बन्द गर्नुहोस्",
+  "common.cancel": "रद्द गर्नुहोस्",
+  "common.save": "सेभ गर्नुहोस्",
+  "common.delete": "मेटाउनुहोस्",
+  "common.ok": "ठिक छ",
+  "common.add": "＋ थप्नुहोस्",
+  "common.today": "आज",
+  "common.allDay": "दिनभर",
+  "common.noEvents": "कुनै कार्यक्रम छैन",
+  "common.searching": "खोज्दैछ…",
+
+  "calendar.shared": "साझा क्यालेन्डर",
+  "calendar.personal": "व्यक्तिगत क्यालेन्डर",
+  "calendar.sharedShort": "साझा",
+  "calendar.personalShort": "व्यक्तिगत",
+  "calendar.switcherLabel": "देखाउने क्यालेन्डर",
+  "calendar.sharedDesc":
+    "सबैसँग साझा गरिएका कार्यक्रमहरू। तपाईंले थपेको वा बदलेको कुरा सबैलाई देखिन्छ।",
+  "calendar.personalDesc":
+    "तपाईंका आफ्नै कार्यक्रम र समय तालिकाका कक्षाहरू। कार्यक्रमहरू यही ब्राउजरमा सेभ हुन्छन्।",
+  "calendar.prevMonth": "अघिल्लो महिना",
+  "calendar.nextMonth": "अर्को महिना",
+  "calendar.dayAria": "{date}, {n} वटा कार्यक्रम",
+  "calendar.more": "अरू {n} वटा",
+  "calendar.hintDoubleClick":
+    "मितिमा डबल-क्लिक गरेर पनि कार्यक्रम थप्न सकिन्छ।",
+  "calendar.hintTimetable":
+    "मेनुको “समय तालिका” बाट समय तालिका बनाउन र हेर्न सकिन्छ।",
+  "calendar.notifyOn": "सूचना सेट गरिएको",
+  "calendar.timetableLabel": "समय तालिका: {title}",
+
+  "menu.open": "मेनु खोल्नुहोस्",
+  "menu.close": "मेनु बन्द गर्नुहोस्",
+  "menu.title": "मेनु",
+  "menu.calendars": "क्यालेन्डर",
+  "menu.view": "देखाउने तरिका",
+  "menu.todaySchedule": "आजका कार्यक्रम",
+  "menu.goToday": "आजको मितिमा जानुहोस्",
+  "menu.timetable": "समय तालिका",
+  "menu.timetableManage": "समय तालिका बनाउनुहोस् / खोज्नुहोस्",
+  "menu.settings": "सेटिङ",
+  "menu.language": "भाषा",
+  "menu.logout": "लगआउट",
+  "menu.logoutConfirm": "लगआउट गर्ने हो?",
+
+  "event.addTitle": "कार्यक्रम थप्नुहोस्",
+  "event.editTitle": "कार्यक्रम सम्पादन गर्नुहोस्",
+  "event.title": "शीर्षक",
+  "event.titlePlaceholder": "उदाहरण: बैठक",
+  "event.date": "मिति",
+  "event.startTime": "सुरु हुने समय",
+  "event.endTime": "सकिने समय",
+  "event.color": "रङ",
+  "event.memo": "टिप्पणी",
+  "event.notify": "सूचना",
+  "event.notifyAllDay":
+    "दिनभरका कार्यक्रमको लागि सूचना सेट गर्न मिल्दैन (सुरु हुने समय राखेपछि सेट गर्न सकिन्छ)।",
+  "event.notifyEnable": "सूचना दिनुहोस्",
+  "event.notifyWhen": "कति समय अगाडि सूचना दिने",
+  "event.notifyUnsupported":
+    "यो ब्राउजरले सूचना समर्थन गर्दैन, त्यसैले सूचना एपभित्र मात्र देखिन्छ।",
+  "event.notifyDenied":
+    "ब्राउजरमा सूचनाको अनुमति छैन, त्यसैले सूचना एपभित्र मात्र देखिन्छ। ब्राउजरको सेटिङबाट सूचनाको अनुमति दिन सकिन्छ।",
+  "event.notifyNote":
+    "※ यो एप खुला रहेको बेला (अर्को ट्याब हेर्दै भए पनि) सूचना दिइन्छ।",
+  "event.notifyNoteShared":
+    "साझा क्यालेन्डरका कार्यक्रमको सूचना एप खुला राख्ने सबैलाई जान्छ।",
+  "event.deleteConfirm": "“{title}” मेटाउने हो?",
+
+  "notify.minutes": "{n} मिनेट अगाडि",
+  "notify.hours": "{n} घण्टा अगाडि",
+  "notify.days": "{n} दिन अगाडि",
+  "reminder.inMinutes": "{n} मिनेटपछि",
+  "reminder.inHours": "{h} घण्टापछि",
+  "reminder.inHoursMinutes": "{h} घण्टा {m} मिनेटपछि",
+  "reminder.title": "{left}: {title}",
+  "reminder.body": "{time} मा सुरु",
+  "reminder.dismiss": "सूचना बन्द गर्नुहोस्",
+
+  "color.blue": "निलो",
+  "color.green": "हरियो",
+  "color.red": "रातो",
+  "color.amber": "पहेँलो",
+  "color.purple": "बैजनी",
+
+  "today.title": "आजका कार्यक्रम",
+  "today.count": "{n} वटा",
+  "today.timetable": "समय तालिका",
+  "today.noClasses": "आज कुनै कक्षा छैन",
+
+  "search.label": "कार्यक्रम खोज्नुहोस्",
+  "search.placeholder": "कार्यक्रम खोज्नुहोस् (शीर्षक, टिप्पणी)",
+  "search.noResults": "“{q}” सँग मिल्ने कुनै कार्यक्रम छैन",
+  "search.results": "खोज नतिजा",
+  "search.more": "अरू {n} वटा। नतिजा सीमित गर्न थप शब्द राख्नुहोस्।",
+
+  "login.tabLogin": "लगइन",
+  "login.tabRegister": "नयाँ दर्ता (पहिलो पटक)",
+  "login.name": "नाम",
+  "login.namePlaceholder": "उदाहरण: Yamada Taro",
+  "login.studentId": "विद्यार्थी नम्बर",
+  "login.studentIdAria": "विद्यार्थी नम्बर ({prefix} पछिको नम्बर)",
+  "login.studentIdNote":
+    "※ विद्यार्थी नम्बरको सुरुको “{prefix}” पहिले नै भरिएको छ। {prefix} पछिको नम्बर मात्र half-width (सामान्य अंग्रेजी) अंकमा लेख्नुहोस्। (उदाहरण: M1234567 → 1234567)",
+  "login.submitRegister": "दर्ता गरेर सुरु गर्नुहोस्",
+  "login.submitLogin": "लगइन",
+  "login.hintRegister":
+    "अर्को पटकदेखि विद्यार्थी नम्बर मात्र प्रयोग गरेर लगइन गर्न सकिन्छ।",
+  "login.hintLogin":
+    "पहिलो पटक हो भने “नयाँ दर्ता” बाट आफ्नो नाम र विद्यार्थी नम्बर दर्ता गर्नुहोस्।",
+
+  "tt.title": "समय तालिका",
+  "tt.editTitle": "समय तालिका सम्पादन गर्नुहोस्",
+  "tt.newTitle": "नयाँ समय तालिका",
+  "tt.tabMine": "मेरो समय तालिका",
+  "tt.tabSearch": "समय तालिका खोज्नुहोस्",
+  "tt.ownedHeading": "मैले बनाएका समय तालिका",
+  "tt.newButton": "＋ नयाँ समय तालिका",
+  "tt.noneOwned":
+    "अहिलेसम्म कुनै समय तालिका छैन। “＋ नयाँ समय तालिका” बाट बनाउन सकिन्छ।",
+  "tt.edit": "सम्पादन",
+  "tt.subscribedHeading": "मैले देखाइरहेका अरूका समय तालिका",
+  "tt.noneSubscribed":
+    "“समय तालिका खोज्नुहोस्” बाट अरूका समय तालिका देखाउन सकिन्छ।",
+  "tt.searchLabel": "समय तालिका खोज्नुहोस्",
+  "tt.searchPlaceholder": "समय तालिकाको नाम, बनाउने व्यक्ति वा विषयबाट खोज्नुहोस्",
+  "tt.searchIntro":
+    "शब्द लेख्नुहोस्, सबैले बनाएका समय तालिका खोज्न सकिन्छ।",
+  "tt.searchNoResults": "“{q}” सँग मिल्ने कुनै समय तालिका छैन",
+  "tt.ownAlwaysShown": "तपाईंको समय तालिका (सधैं देखिन्छ)",
+  "tt.cardMeta": "बनाउने: {owner} · {start} – {end} · {n} कक्षा",
+  "tt.showContents": "विवरण हेर्नुहोस्",
+  "tt.subscribe": "मेरो क्यालेन्डरमा देखाउनुहोस्",
+  "tt.unsubscribe": "देखाउन बन्द गर्नुहोस्",
+  "tt.deleteConfirm":
+    "“{title}” मेटाउने हो?\nयसलाई देखाइरहेका अरूको क्यालेन्डरबाट पनि हट्नेछ।",
+
+  "tte.name": "समय तालिकाको नाम (खोजमा यही नाम देखिन्छ)",
+  "tte.namePlaceholder": "उदाहरण: सूचना इन्जिनियरिङ दोस्रो वर्ष, पहिलो सेमेस्टर",
+  "tte.term": "अवधि",
+  "tte.startDate": "सुरु मिति",
+  "tte.endDate": "अन्तिम मिति",
+  "tte.periodsHeading": "पिरियड र समय",
+  "tte.period": "पिरियड {n}",
+  "tte.periodStart": "पिरियड {n} को सुरु हुने समय",
+  "tte.periodEnd": "पिरियड {n} को सकिने समय",
+  "tte.addPeriod": "＋ पिरियड थप्नुहोस्",
+  "tte.removePeriod": "− अन्तिम पिरियड हटाउनुहोस्",
+  "tte.classesHeading": "कक्षाहरू (कोठामा क्लिक गरेर लेख्नुहोस्)",
+  "tte.create": "बनाउनुहोस्",
+  "tte.cell": "{day} {period}: {subject}",
+  "tte.cellEmpty": "{day} {period} (खाली)",
+  "tte.slotHeading": "{day} {period}",
+  "tte.subject": "विषयको नाम",
+  "tte.subjectPlaceholder": "विषयको नाम (उदाहरण: रेखीय बीजगणित)",
+  "tte.room": "कक्षाकोठा",
+  "tte.roomPlaceholder": "कक्षाकोठा (ऐच्छिक)",
+  "tte.memoPlaceholder": "टिप्पणी (ऐच्छिक)",
+  "tte.clearSlot": "यो कक्षा खाली गर्नुहोस्",
+
+  "lang.title": "भाषा छान्नुहोस्",
+  "lang.intro":
+    "देखाउने भाषा छान्नुहोस्। पछि मेनुको “भाषा” बाट बदल्न सकिन्छ।",
+  "lang.searchPlaceholder": "भाषा खोज्नुहोस् (उदाहरण: English, 中文, 한국어)",
+  "lang.noResults": "मिल्ने भाषा छैन",
+
+  "err.generic": "त्रुटि भयो",
+  "err.unauthorized": "कृपया लगइन गर्नुहोस्",
+  "err.invalid": "विवरण मान्य छैन",
+  "err.server": "सर्भरमा त्रुटि भयो",
+  "err.studentIdTaken":
+    "यो विद्यार्थी नम्बर पहिले नै दर्ता भइसकेको छ। “लगइन” बाट प्रवेश गर्नुहोस्।",
+  "err.studentIdNotFound":
+    "यो विद्यार्थी नम्बर दर्ता भएको छैन। पहिलो पटक हो भने “नयाँ दर्ता” बाट दर्ता गर्नुहोस्।",
+  "err.forbidden": "यो समय तालिका बनाउने व्यक्तिले मात्र सम्पादन गर्न सक्नुहुन्छ",
+  "err.notFound": "समय तालिका भेटिएन",
+  "err.sharedLoad":
+    "साझा क्यालेन्डर लोड गर्न सकिएन। इन्टरनेट जडान जाँच गर्नुहोस्।",
+  "err.timetablesLoad": "समय तालिका लोड गर्न सकिएन",
+  "err.saveFailed": "सेभ गर्न सकिएन",
+  "err.deleteFailed": "मेटाउन सकिएन",
+  "err.changeFailed": "बदल्न सकिएन",
+  "err.searchFailed": "खोज्न सकिएन",
+  "err.studentIdRequired": "विद्यार्थी नम्बर लेख्नुहोस्",
+  "err.studentIdFullWidth":
+    "अंकहरू half-width (सामान्य अंग्रेजी अंक 0-9) मा लेख्नुहोस् (full-width अंक प्रयोग गर्न मिल्दैन)",
+  "err.studentIdDigits":
+    "{prefix} पछिको नम्बर half-width (सामान्य अंग्रेजी) अंकमा मात्र लेख्नुहोस्",
+  "err.studentIdTooLong": "नम्बर धेरै लामो भयो",
+  "err.studentIdPrefix": "विद्यार्थी नम्बर {prefix} बाट सुरु हुनुपर्छ",
+  "err.nameRequired": "नाम लेख्नुहोस्",
+  "err.nameTooLong": "नाम 50 अक्षरभित्र लेख्नुहोस्",
+  "err.eventTitleRequired": "शीर्षक लेख्नुहोस्",
+  "err.eventEndBeforeStart": "सकिने समय सुरु हुने समयभन्दा पछि हुनुपर्छ",
+  "err.ttTitleRequired": "समय तालिकाको नाम लेख्नुहोस्",
+  "err.ttDatesRequired": "अवधि लेख्नुहोस्",
+  "err.ttEndBeforeStart": "अवधिको अन्तिम मिति सुरु मितिभन्दा पछि हुनुपर्छ",
+  "err.ttNoPeriods": "कम्तीमा एउटा पिरियड सेट गर्नुहोस्",
+  "err.ttTooManyPeriods": "बढीमा {n} वटा पिरियड मात्र राख्न सकिन्छ",
+  "err.ttPeriodTime": "पिरियड {n} को समय लेख्नुहोस्",
+  "err.ttPeriodEndBeforeStart":
+    "पिरियड {n} को सकिने समय सुरु हुने समयभन्दा पछि हुनुपर्छ",
+  "err.subjectRequired": "विषयको नाम लेख्नुहोस्",
+};
+
+export default ne;

@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import type { User } from "../user";
 import { readData, updateData } from "./db";
+import { apiError } from "./http";
 
 const COOKIE = "kz_session";
 const SESSION_DAYS = 180;
@@ -75,5 +76,4 @@ export async function currentUser(): Promise<User | null> {
   return findUser(s.studentId);
 }
 
-export const unauthorized = () =>
-  Response.json({ error: "ログインしてください" }, { status: 401 });
+export const unauthorized = () => apiError("unauthorized", 401);

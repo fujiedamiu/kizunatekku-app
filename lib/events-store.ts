@@ -1,18 +1,15 @@
 import { useSyncExternalStore } from "react";
 import { parseEvent, toDateKey, type CalendarEvent } from "./calendar";
+import { AppError, errorFromResponse, type ErrorCode } from "./errors";
 
 /** shared: 全員で共有する共通カレンダー / personal: このブラウザだけの個人カレンダー */
 export type CalendarKind = "shared" | "personal";
 
-export const CALENDAR_LABELS: Record<CalendarKind, string> = {
-  shared: "共通",
-  personal: "個人",
-};
-
 export type EventsState = {
   /** 読み込み前は null */
   events: CalendarEvent[] | null;
-  error: string | null;
+  /** 読み込みエラーの種類 (画面で選択中の言語に翻訳する) */
+  error: ErrorCode | null;
 };
 
 type Store = {
@@ -144,10 +141,7 @@ function createSharedStore(): Store {
 
   const applyResponse = async (res: Response) => {
     if (!res.ok) {
-      const body = (await res.json().catch(() => null)) as {
-        error?: string;
-      } | null;
-      throw new Error(body?.error ?? `サーバーエラー (${res.status})`);
+      throw await errorFromResponse(res);
     }
     const data: unknown = await res.json();
     const events = Array.isArray(data)
@@ -160,10 +154,7 @@ function createSharedStore(): Store {
     try {
       await applyResponse(await fetch(SHARED_URL, { cache: "no-store" }));
     } catch {
-      set({
-        ...state,
-        error: "共通カレンダーを読み込めませんでした。通信状況を確認してください。",
-      });
+      set({ ...state, error: "sharedLoad" });
     }
   };
 
@@ -189,9 +180,7 @@ function createSharedStore(): Store {
       await applyResponse(await request());
     } catch (err) {
       void refresh();
-      throw err instanceof Error
-        ? err
-        : new Error("共通カレンダーに保存できませんでした");
+      throw err instanceof AppError ? err : new AppError("saveFailed");
     }
   };
 

@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { errorFromResponse } from "./errors";
 import { setEventsUser } from "./events-store";
 import { clearTimetables } from "./timetable-store";
 import type { User } from "./user";
@@ -53,12 +54,8 @@ async function post(body: Record<string, string>) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  const data = (await res.json().catch(() => ({}))) as {
-    user?: User;
-    error?: string;
-  };
-  if (!res.ok || !data.user)
-    throw new Error(data.error ?? `エラーが発生しました (${res.status})`);
+  if (!res.ok) throw await errorFromResponse(res);
+  const data = (await res.json()) as { user: User };
   set({ status: "user", user: data.user });
 }
 

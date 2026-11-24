@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { parseEvent } from "@/lib/calendar";
 import { currentUser, unauthorized } from "@/lib/server/auth";
+import { apiError } from "@/lib/server/http";
 import {
   deleteSharedEvent,
   listSharedEvents,
@@ -23,11 +24,11 @@ export async function PUT(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "JSON が不正です" }, { status: 400 });
+    return apiError("invalid", 400);
   }
   const event = parseEvent(body);
   if (!event) {
-    return Response.json({ error: "予定の内容が不正です" }, { status: 400 });
+    return apiError("invalid", 400);
   }
   return Response.json(await upsertSharedEvent(event), { headers: noStore });
 }
@@ -37,7 +38,7 @@ export async function DELETE(request: Request) {
   if (!(await currentUser())) return unauthorized();
   const id = new URL(request.url).searchParams.get("id");
   if (!id) {
-    return Response.json({ error: "id がありません" }, { status: 400 });
+    return apiError("invalid", 400);
   }
   return Response.json(await deleteSharedEvent(id), { headers: noStore });
 }

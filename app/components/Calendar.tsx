@@ -3,9 +3,8 @@
 import { useCallback, useMemo, useState } from "react";
 import {
   COLORS,
-  WEEKDAYS,
   compareEvents,
-  formatLongDate,
+  formatNotifyBefore,
   monthGrid,
   parseDateKey,
   toDateKey,
@@ -13,7 +12,6 @@ import {
   type EventColor,
 } from "@/lib/calendar";
 import {
-  CALENDAR_LABELS,
   setCalendarKind,
   useCalendarKind,
   useEvents,
@@ -21,6 +19,7 @@ import {
   type CalendarKind,
 } from "@/lib/events-store";
 import { logout } from "@/lib/auth-store";
+import { useI18n, type Translate } from "@/lib/i18n";
 import { expandTimetables, type ClassOccurrence } from "@/lib/timetable";
 import { useMyTimetables } from "@/lib/timetable-store";
 import type { User } from "@/lib/user";
@@ -29,6 +28,7 @@ import TodayDialog from "./TodayDialog";
 import AppMenu from "./AppMenu";
 import SearchBox from "./SearchBox";
 import TimetableManager from "./TimetableManager";
+import ReminderWatcher from "./ReminderWatcher";
 
 const MAX_CHIPS = 3;
 
@@ -57,6 +57,7 @@ function sortItems(items: DayItem[]) {
 }
 
 export default function Calendar({ user }: { user: User }) {
+  const { t, longDate, monthTitle, weekdayShort } = useI18n();
   const kind = useCalendarKind();
   const { events, error } = useEvents(kind);
   const { timetables } = useMyTimetables();
@@ -111,7 +112,7 @@ export default function Calendar({ user }: { user: User }) {
           onLogout={() => void logout()}
         />
         <h1 className="hidden shrink-0 text-lg font-bold sm:block">
-          キズナテック カレンダー
+          {t("app.title")}
         </h1>
         <div className="flex flex-1 justify-end">
           <SearchBox onJump={jumpTo} />
@@ -125,7 +126,7 @@ export default function Calendar({ user }: { user: User }) {
       <>
         {header}
         <div className="flex flex-1 items-center justify-center text-zinc-500">
-          読み込み中…
+          {t("common.loading")}
         </div>
       </>
     );
@@ -196,7 +197,7 @@ export default function Calendar({ user }: { user: User }) {
         <div className="flex flex-wrap items-center gap-3">
           <div
             role="tablist"
-            aria-label="表示するカレンダー"
+            aria-label={t("calendar.switcherLabel")}
             className="inline-flex rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-950"
           >
             {(["shared", "personal"] as CalendarKind[]).map((k) => (
@@ -211,14 +212,14 @@ export default function Calendar({ user }: { user: User }) {
                     : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
                 }`}
               >
-                {CALENDAR_LABELS[k]}カレンダー
+                {t(k === "shared" ? "calendar.shared" : "calendar.personal")}
               </button>
             ))}
           </div>
           <p className="text-xs text-zinc-500">
             {kind === "shared"
-              ? "みんなで共有する予定です。追加・変更は全員に表示されます。"
-              : "自分だけの予定と、時間割の授業です。予定はこのブラウザに保存されます。"}
+              ? t("calendar.sharedDesc")
+              : t("calendar.personalDesc")}
           </p>
         </div>
 
@@ -236,10 +237,10 @@ export default function Calendar({ user }: { user: User }) {
           <section className="flex flex-1 flex-col rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
             <header className="flex items-center gap-2 border-b border-zinc-200 p-3 dark:border-zinc-800">
               <h2 className="mr-auto text-xl font-semibold tabular-nums">
-                {year}年{month + 1}月
+                {monthTitle(year, month)}
                 {!events && (
                   <span className="ml-2 text-sm font-normal text-zinc-500">
-                    読み込み中…
+                    {t("common.loading")}
                   </span>
                 )}
               </h2>
@@ -247,18 +248,18 @@ export default function Calendar({ user }: { user: User }) {
                 onClick={goToday}
                 className="rounded-lg border border-zinc-300 px-3 py-1.5 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
               >
-                今日
+                {t("common.today")}
               </button>
               <button
                 onClick={() => moveMonth(-1)}
-                aria-label="前の月"
+                aria-label={t("calendar.prevMonth")}
                 className="rounded-lg px-2.5 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 ‹
               </button>
               <button
                 onClick={() => moveMonth(1)}
-                aria-label="次の月"
+                aria-label={t("calendar.nextMonth")}
                 className="rounded-lg px-2.5 py-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 ›
@@ -266,9 +267,9 @@ export default function Calendar({ user }: { user: User }) {
             </header>
 
             <div className="grid grid-cols-7 border-b border-zinc-200 text-center text-xs font-medium dark:border-zinc-800">
-              {WEEKDAYS.map((w, i) => (
+              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
                 <div
-                  key={w}
+                  key={i}
                   className={`py-2 ${
                     i === 0
                       ? "text-rose-600"
@@ -277,7 +278,7 @@ export default function Calendar({ user }: { user: User }) {
                         : "text-zinc-500"
                   }`}
                 >
-                  {w}
+                  {weekdayShort(i)}
                 </div>
               ))}
             </div>
@@ -296,7 +297,10 @@ export default function Calendar({ user }: { user: User }) {
                     key={key}
                     onClick={() => setSelected(key)}
                     onDoubleClick={() => events && openNew(key)}
-                    aria-label={`${formatLongDate(key)}、予定${items.length}件`}
+                    aria-label={t("calendar.dayAria", {
+                      date: longDate(key),
+                      n: items.length,
+                    })}
                     aria-pressed={isSelected}
                     className={`flex min-h-20 flex-col items-stretch gap-1 border-r border-b border-zinc-100 p-1 text-left transition-colors sm:min-h-24 dark:border-zinc-900 ${
                       isSelected
@@ -337,7 +341,7 @@ export default function Calendar({ user }: { user: User }) {
                     ))}
                     {items.length > MAX_CHIPS && (
                       <span className="px-1 text-[11px] text-zinc-500">
-                        他{items.length - MAX_CHIPS}件
+                        {t("calendar.more", { n: items.length - MAX_CHIPS })}
                       </span>
                     )}
                   </button>
@@ -351,22 +355,22 @@ export default function Calendar({ user }: { user: User }) {
             <div className="flex items-center justify-between gap-2">
               <div>
                 <p className="text-xs text-zinc-500">
-                  {CALENDAR_LABELS[kind]}カレンダー
+                  {t(kind === "shared" ? "calendar.shared" : "calendar.personal")}
                 </p>
-                <h3 className="font-semibold">{formatLongDate(selectedKey)}</h3>
+                <h3 className="font-semibold">{longDate(selectedKey)}</h3>
               </div>
               <button
                 onClick={() => openNew(selectedKey)}
                 disabled={!events}
                 className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
               >
-                ＋ 追加
+                {t("common.add")}
               </button>
             </div>
 
             {selectedItems.length === 0 ? (
               <p className="py-6 text-center text-sm text-zinc-500">
-                予定はありません
+                {t("common.noEvents")}
               </p>
             ) : (
               <ul className="space-y-2">
@@ -379,7 +383,7 @@ export default function Calendar({ user }: { user: User }) {
                         }
                         className="flex w-full items-start gap-3 rounded-xl p-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900"
                       >
-                        <EventSummary event={item.event} />
+                        <EventSummary event={item.event} t={t} />
                       </button>
                     </li>
                   ) : (
@@ -388,7 +392,7 @@ export default function Calendar({ user }: { user: User }) {
                         onClick={() => setShowTimetables(true)}
                         className="flex w-full items-start gap-3 rounded-xl p-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900"
                       >
-                        <ClassSummary cls={item.cls} />
+                        <ClassSummary cls={item.cls} t={t} />
                       </button>
                     </li>
                   ),
@@ -397,9 +401,9 @@ export default function Calendar({ user }: { user: User }) {
             )}
 
             <p className="mt-auto text-xs text-zinc-400">
-              日付をダブルクリックでも予定を追加できます。
+              {t("calendar.hintDoubleClick")}
               {kind === "personal" &&
-                "時間割はメニューの「時間割」から作成・表示できます。"}
+                ` ${t("calendar.hintTimetable")}`}
             </p>
           </aside>
         </div>
@@ -416,6 +420,8 @@ export default function Calendar({ user }: { user: User }) {
           <TimetableManager today={today} onClose={closeTimetables} />
         )}
 
+        <ReminderWatcher />
+
         {editing && (
           <EventDialog
             key={`${kind}:${editing.event.id}`}
@@ -430,7 +436,13 @@ export default function Calendar({ user }: { user: User }) {
   );
 }
 
-function EventSummary({ event: e }: { event: CalendarEvent }) {
+function EventSummary({
+  event: e,
+  t,
+}: {
+  event: CalendarEvent;
+  t: Translate;
+}) {
   return (
     <>
       <span
@@ -439,7 +451,12 @@ function EventSummary({ event: e }: { event: CalendarEvent }) {
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{e.title}</span>
         <span className="block text-xs text-zinc-500 tabular-nums">
-          {e.allDay ? "終日" : `${e.start ?? ""}${e.end ? ` 〜 ${e.end}` : ""}`}
+          {e.allDay ? t("common.allDay") : `${e.start ?? ""}${e.end ? ` 〜 ${e.end}` : ""}`}
+          {e.notifyBefore !== undefined && (
+            <span className="ml-2" title={t("calendar.notifyOn")}>
+              🔔 {formatNotifyBefore(e.notifyBefore, t)}
+            </span>
+          )}
         </span>
         {e.memo && (
           <span className="mt-1 block text-xs whitespace-pre-wrap text-zinc-600 dark:text-zinc-400">
@@ -451,7 +468,13 @@ function EventSummary({ event: e }: { event: CalendarEvent }) {
   );
 }
 
-export function ClassSummary({ cls: c }: { cls: ClassOccurrence }) {
+export function ClassSummary({
+  cls: c,
+  t,
+}: {
+  cls: ClassOccurrence;
+  t: Translate;
+}) {
   return (
     <>
       <span
@@ -461,10 +484,10 @@ export function ClassSummary({ cls: c }: { cls: ClassOccurrence }) {
         <span className="block truncate font-medium">{c.subject}</span>
         <span className="block text-xs text-zinc-500 tabular-nums">
           {c.start} 〜 {c.end}
-          {c.room ? `・${c.room}` : ""}
+          {c.room ? ` · ${c.room}` : ""}
         </span>
         <span className="block truncate text-xs text-zinc-400">
-          時間割：{c.timetableTitle}
+          {t("calendar.timetableLabel", { title: c.timetableTitle })}
         </span>
         {c.memo && (
           <span className="mt-1 block text-xs whitespace-pre-wrap text-zinc-600 dark:text-zinc-400">

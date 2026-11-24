@@ -4,14 +4,13 @@ import { useId, useMemo, useState } from "react";
 import {
   COLORS,
   compareEvents,
-  formatLongDate,
   type CalendarEvent,
 } from "@/lib/calendar";
 import {
-  CALENDAR_LABELS,
   useEvents,
   type CalendarKind,
 } from "@/lib/events-store";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   /** 検索結果を選んだときに、そのカレンダー・日付へ移動する */
@@ -27,6 +26,7 @@ const normalize = (s: string) => s.normalize("NFKC").toLowerCase();
 
 /** 共通・個人の両方のカレンダーから、タイトルとメモで予定を検索する */
 export default function SearchBox({ onJump }: Props) {
+  const { t, longDate } = useI18n();
   const shared = useEvents("shared");
   const personal = useEvents("personal");
   const [query, setQuery] = useState("");
@@ -108,14 +108,14 @@ export default function SearchBox({ onJump }: Props) {
       <input
         type="search"
         role="combobox"
-        aria-label="予定を検索"
+        aria-label={t("search.label")}
         aria-expanded={expanded}
         aria-controls={listId}
         aria-autocomplete="list"
         aria-activedescendant={
           expanded && shown.length > 0 ? optionId(active) : undefined
         }
-        placeholder="予定を検索（タイトル・メモ）"
+        placeholder={t("search.placeholder")}
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
@@ -136,11 +136,11 @@ export default function SearchBox({ onJump }: Props) {
         >
           {shown.length === 0 ? (
             <p className="px-3 py-4 text-center text-sm text-zinc-500">
-              「{query.trim()}」に一致する予定はありません
+              {t("search.noResults", { q: query.trim() })}
             </p>
           ) : (
             <>
-              <ul id={listId} role="listbox" aria-label="検索結果">
+              <ul id={listId} role="listbox" aria-label={t("search.results")}>
                 {shown.map((hit, i) => (
                   <li
                     key={`${hit.kind}:${hit.event.id}`}
@@ -161,24 +161,23 @@ export default function SearchBox({ onJump }: Props) {
                         {hit.event.title}
                       </span>
                       <span className="block text-xs text-zinc-500 tabular-nums">
-                        {formatLongDate(hit.event.date)}
+                        {longDate(hit.event.date)}
                         {hit.event.allDay
-                          ? " 終日"
+                          ? ` ${t("common.allDay")}`
                           : hit.event.start
                             ? ` ${hit.event.start}`
                             : ""}
                       </span>
                     </span>
                     <span className="shrink-0 rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-                      {CALENDAR_LABELS[hit.kind]}
+                      {t(hit.kind === "shared" ? "calendar.sharedShort" : "calendar.personalShort")}
                     </span>
                   </li>
                 ))}
               </ul>
               {hits.length > shown.length && (
                 <p className="px-3 py-2 text-xs text-zinc-500">
-                  ほか{hits.length - shown.length}
-                  件。キーワードを増やして絞り込んでください。
+                  {t("search.more", { n: hits.length - shown.length })}
                 </p>
               )}
             </>

@@ -1,4 +1,5 @@
 import { currentUser, unauthorized } from "@/lib/server/auth";
+import { apiError } from "@/lib/server/http";
 import { setSubscribed } from "@/lib/server/timetables";
 
 async function handle(
@@ -9,7 +10,7 @@ async function handle(
   if (!user) return unauthorized();
   const { id } = await ctx.params;
   if (!(await setSubscribed(user, id, subscribed)))
-    return Response.json({ error: "時間割が見つかりません" }, { status: 404 });
+    return apiError("notFound", 404);
   return Response.json({ ok: true });
 }
 

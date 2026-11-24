@@ -1,3 +1,5 @@
+import type { ValidationError } from "./errors";
+
 export type User = {
   studentId: string;
   name: string;
@@ -12,25 +14,24 @@ export function normalizeStudentId(value: string): string {
 }
 
 /** 入力欄の番号部分 (M の後ろ) を検証する。半角数字のみ */
-export function validateStudentNumber(value: string): string | null {
-  if (!value) return "学籍番号を入力してください";
-  if (/[０-９]/.test(value))
-    return "数字は半角で入力してください（全角は使えません）";
+export function validateStudentNumber(value: string): ValidationError {
+  if (!value) return { code: "studentIdRequired" };
+  if (/[０-９]/.test(value)) return { code: "studentIdFullWidth" };
   if (!/^[0-9]+$/.test(value))
-    return "M の後ろの番号を半角数字だけで入力してください";
-  if (value.length > 19) return "番号が長すぎます";
+    return { code: "studentIdDigits", params: { prefix: STUDENT_ID_PREFIX } };
+  if (value.length > 19) return { code: "studentIdTooLong" };
   return null;
 }
 
 /** 学籍番号全体 (M + 半角数字) を検証する */
-export function validateStudentId(value: string): string | null {
+export function validateStudentId(value: string): ValidationError {
   if (!value.startsWith(STUDENT_ID_PREFIX))
-    return "学籍番号は M から始まる必要があります";
+    return { code: "studentIdPrefix", params: { prefix: STUDENT_ID_PREFIX } };
   return validateStudentNumber(value.slice(STUDENT_ID_PREFIX.length));
 }
 
-export function validateName(value: string): string | null {
-  if (!value) return "名前を入力してください";
-  if (value.length > 50) return "名前は50文字以内で入力してください";
+export function validateName(value: string): ValidationError {
+  if (!value) return { code: "nameRequired" };
+  if (value.length > 50) return { code: "nameTooLong" };
   return null;
 }

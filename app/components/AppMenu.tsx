@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { CALENDAR_LABELS, type CalendarKind } from "@/lib/events-store";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { CalendarKind } from "@/lib/events-store";
+import { LANGUAGES, useI18n } from "@/lib/i18n";
 import type { User } from "@/lib/user";
+import LanguagePicker from "./LanguagePicker";
 
 type Props = {
   user: User;
@@ -26,7 +28,10 @@ export default function AppMenu({
   onOpenTimetables,
   onLogout,
 }: Props) {
+  const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const closeLanguage = useCallback(() => setLanguageOpen(false), []);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const close = () => {
@@ -59,12 +64,14 @@ export default function AppMenu({
         : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
     }`;
 
+  const currentLanguage = LANGUAGES.find((l) => l.code === lang)?.native;
+
   return (
     <>
       <button
         ref={buttonRef}
         onClick={() => setOpen(true)}
-        aria-label="メニューを開く"
+        aria-label={t("menu.open")}
         aria-haspopup="dialog"
         aria-expanded={open}
         className="-ml-1 flex size-9 items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
@@ -87,16 +94,16 @@ export default function AppMenu({
           <nav
             role="dialog"
             aria-modal="true"
-            aria-label="メニュー"
+            aria-label={t("menu.title")}
             onClick={(e) => e.stopPropagation()}
-            className="flex h-full w-72 max-w-[85vw] flex-col gap-6 bg-white p-4 shadow-xl dark:bg-zinc-900"
+            className="flex h-full w-72 max-w-[85vw] flex-col gap-6 overflow-y-auto overscroll-contain bg-white p-4 shadow-xl dark:bg-zinc-900"
           >
             <div className="flex items-center justify-between">
-              <span className="font-bold">メニュー</span>
+              <span className="font-bold">{t("menu.title")}</span>
               <button
                 autoFocus
                 onClick={close}
-                aria-label="メニューを閉じる"
+                aria-label={t("menu.close")}
                 className="flex size-9 items-center justify-center rounded-lg text-xl hover:bg-zinc-100 dark:hover:bg-zinc-800"
               >
                 ×
@@ -105,7 +112,7 @@ export default function AppMenu({
 
             <section className="space-y-1">
               <h2 className="px-3 text-xs font-semibold text-zinc-500">
-                カレンダー
+                {t("menu.calendars")}
               </h2>
               {KINDS.map((k) => (
                 <button
@@ -115,32 +122,51 @@ export default function AppMenu({
                   className={itemClass(kind === k)}
                 >
                   <span aria-hidden="true">{k === "shared" ? "👥" : "👤"}</span>
-                  {CALENDAR_LABELS[k]}カレンダー
+                  {t(k === "shared" ? "calendar.shared" : "calendar.personal")}
                 </button>
               ))}
             </section>
 
             <section className="space-y-1">
               <h2 className="px-3 text-xs font-semibold text-zinc-500">
-                表示
+                {t("menu.view")}
               </h2>
               <button onClick={choose(onShowToday)} className={itemClass()}>
                 <span aria-hidden="true">📋</span>
-                本日の予定
+                {t("menu.todaySchedule")}
               </button>
               <button onClick={choose(onGoToday)} className={itemClass()}>
                 <span aria-hidden="true">📅</span>
-                今日の日付に移動
+                {t("menu.goToday")}
               </button>
             </section>
 
             <section className="space-y-1">
               <h2 className="px-3 text-xs font-semibold text-zinc-500">
-                時間割
+                {t("menu.timetable")}
               </h2>
               <button onClick={choose(onOpenTimetables)} className={itemClass()}>
                 <span aria-hidden="true">📚</span>
-                時間割の作成・検索
+                {t("menu.timetableManage")}
+              </button>
+            </section>
+
+            <section className="space-y-1">
+              <h2 className="px-3 text-xs font-semibold text-zinc-500">
+                {t("menu.settings")}
+              </h2>
+              <button
+                onClick={choose(() => setLanguageOpen(true))}
+                className={itemClass()}
+              >
+                <span aria-hidden="true">🌐</span>
+                <span className="flex-1">
+                  {t("menu.language")}
+                  {lang !== "en" && (
+                    <span className="text-zinc-400"> / Language</span>
+                  )}
+                </span>
+                <span className="text-xs text-zinc-500">{currentLanguage}</span>
               </button>
             </section>
 
@@ -153,17 +179,19 @@ export default function AppMenu({
               </div>
               <button
                 onClick={choose(() => {
-                  if (window.confirm("ログアウトしますか？")) onLogout();
+                  if (window.confirm(t("menu.logoutConfirm"))) onLogout();
                 })}
                 className={itemClass()}
               >
                 <span aria-hidden="true">🚪</span>
-                ログアウト
+                {t("menu.logout")}
               </button>
             </section>
           </nav>
         </div>
       )}
+
+      {languageOpen && <LanguagePicker onClose={closeLanguage} />}
     </>
   );
 }

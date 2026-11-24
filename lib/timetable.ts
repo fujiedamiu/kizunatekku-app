@@ -1,4 +1,7 @@
 import { COLORS, parseDateKey, toDateKey, type EventColor } from "./calendar";
+import type { ValidationError } from "./errors";
+
+type Failure = { ok: false; error: NonNullable<ValidationError> };
 
 /** 時限の時刻 (例: 1限 09:00〜10:30) */
 export type Period = { start: string; end: string };
@@ -60,40 +63,46 @@ const str = (v: unknown, max: number) =>
 /** 外部から受け取った時間割の内容を検証する。OK なら整えた値、NG ならエラーメッセージ */
 export function parseTimetableInput(
   value: unknown,
-): { ok: true; value: TimetableInput } | { ok: false; error: string } {
+): { ok: true; value: TimetableInput } | Failure {
   if (typeof value !== "object" || value === null)
-    return { ok: false, error: "内容が不正です" };
+    return { ok: false, error: { code: "invalid" } };
   const v = value as Record<string, unknown>;
 
   const title = str(v.title, 100);
-  if (!title) return { ok: false, error: "時間割の名前を入力してください" };
+  if (!title) return { ok: false, error: { code: "ttTitleRequired" } };
 
   const startDate = typeof v.startDate === "string" ? v.startDate : "";
   const endDate = typeof v.endDate === "string" ? v.endDate : "";
   if (!DATE_RE.test(startDate) || !DATE_RE.test(endDate))
-    return { ok: false, error: "期間を入力してください" };
+    return { ok: false, error: { code: "ttDatesRequired" } };
   if (endDate < startDate)
-    return { ok: false, error: "期間の終了日は開始日より後にしてください" };
+    return { ok: false, error: { code: "ttEndBeforeStart" } };
 
   if (!Array.isArray(v.periods) || v.periods.length === 0)
-    return { ok: false, error: "時限を1つ以上設定してください" };
+    return { ok: false, error: { code: "ttNoPeriods" } };
   if (v.periods.length > MAX_PERIODS)
-    return { ok: false, error: `時限は${MAX_PERIODS}個までです` };
+    return {
+      ok: false,
+      error: { code: "ttTooManyPeriods", params: { n: MAX_PERIODS } },
+    };
   const periods: Period[] = [];
   for (const [i, p] of v.periods.entries()) {
     const start = (p as Period)?.start;
     const end = (p as Period)?.end;
     if (!TIME_RE.test(start) || !TIME_RE.test(end))
-      return { ok: false, error: `${i + 1}限の時刻を入力してください` };
+      return {
+        ok: false,
+        error: { code: "ttPeriodTime", params: { n: i + 1 } },
+      };
     if (end <= start)
       return {
         ok: false,
-        error: `${i + 1}限の終了時刻は開始時刻より後にしてください`,
+        error: { code: "ttPeriodEndBeforeStart", params: { n: i + 1 } },
       };
     periods.push({ start, end });
   }
 
-  if (!Array.isArray(v.slots)) return { ok: false, error: "内容が不正です" };
+  if (!Array.isArray(v.slots)) return { ok: false, error: { code: "invalid" } };
   const slots: TimetableSlot[] = [];
   const used = new Set<string>();
   for (const s of v.slots as Record<string, unknown>[]) {

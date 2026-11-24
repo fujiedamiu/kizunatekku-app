@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import { currentUser, unauthorized } from "@/lib/server/auth";
+import { apiError } from "@/lib/server/http";
 import {
   createTimetable,
   searchTimetables,
@@ -22,6 +23,6 @@ export async function POST(request: Request) {
   const user = await currentUser();
   if (!user) return unauthorized();
   const parsed = parseTimetableInput(await request.json().catch(() => null));
-  if (!parsed.ok) return Response.json({ error: parsed.error }, { status: 400 });
+  if (!parsed.ok) return apiError(parsed.error.code, 400, parsed.error.params);
   return Response.json(await createTimetable(user, parsed.value));
 }

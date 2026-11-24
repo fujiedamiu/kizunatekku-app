@@ -1,10 +1,11 @@
 import { useSyncExternalStore } from "react";
+import { AppError, errorFromResponse, type ErrorCode } from "./errors";
 import type { TimetableInput, TimetableView } from "./timetable";
 
 export type TimetablesState = {
   /** 自分が作った時間割 + 表示中の他の人の時間割。読み込み前は null */
   timetables: TimetableView[] | null;
-  error: string | null;
+  error: ErrorCode | null;
 };
 
 const POLL_MS = 60_000;
@@ -19,17 +20,15 @@ const set = (next: TimetablesState) => {
 };
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, { cache: "no-store", ...init });
-  const body = (await res.json().catch(() => null)) as
-    | (T & { error?: string })
-    | null;
-  if (!res.ok) {
-    throw new Error(
-      (body as { error?: string } | null)?.error ??
-        `サーバーエラー (${res.status})`,
-    );
+  let res: Response;
+  try {
+    res = await fetch(url, { cache: "no-store", ...init });
+  } catch (err) {
+    if (init?.signal?.aborted) throw err;
+    throw new AppError("server");
   }
-  return body as T;
+  if (!res.ok) throw await errorFromResponse(res);
+  return (await res.json()) as T;
 }
 
 /** 自分の時間割一覧を読み直す */
@@ -38,7 +37,7 @@ export async function refreshTimetables() {
     const timetables = await request<TimetableView[]>("/api/me/timetables");
     set({ timetables, error: null });
   } catch {
-    set({ ...state, error: "時間割を読み込めませんでした" });
+    set({ ...state, error: "timetablesLoad" });
   }
 }
 
