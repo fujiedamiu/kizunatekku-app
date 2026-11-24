@@ -78,3 +78,34 @@ export function compareEvents(a: CalendarEvent, b: CalendarEvent): number {
   if (a.allDay !== b.allDay) return a.allDay ? -1 : 1;
   return (a.start ?? "").localeCompare(b.start ?? "");
 }
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_RE = /^\d{2}:\d{2}$/;
+
+/** 外部から受け取った値を検証し、正しい予定なら整えて返す (不正なら null) */
+export function parseEvent(value: unknown): CalendarEvent | null {
+  if (typeof value !== "object" || value === null) return null;
+  const v = value as Record<string, unknown>;
+  if (typeof v.id !== "string" || v.id.length === 0 || v.id.length > 100)
+    return null;
+  if (typeof v.title !== "string") return null;
+  const title = v.title.trim();
+  if (title.length === 0 || title.length > 200) return null;
+  if (typeof v.date !== "string" || !DATE_RE.test(v.date)) return null;
+  if (typeof v.allDay !== "boolean") return null;
+  if (typeof v.color !== "string" || !(v.color in COLORS)) return null;
+  const time = (t: unknown) =>
+    typeof t === "string" && TIME_RE.test(t) ? t : undefined;
+  if (v.memo !== undefined && typeof v.memo !== "string") return null;
+  const memo = typeof v.memo === "string" ? v.memo.slice(0, 2000) : undefined;
+  return {
+    id: v.id,
+    title,
+    date: v.date,
+    allDay: v.allDay,
+    start: v.allDay ? undefined : time(v.start),
+    end: v.allDay ? undefined : time(v.end),
+    color: v.color as EventColor,
+    memo: memo || undefined,
+  };
+}

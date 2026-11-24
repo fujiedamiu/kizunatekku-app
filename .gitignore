@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 共通カレンダーのデータ (サーバー上に保存)
+/data

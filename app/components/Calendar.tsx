@@ -11,15 +11,24 @@ import {
   toDateKey,
   type CalendarEvent,
 } from "@/lib/calendar";
-import { useEvents, useToday } from "@/lib/events-store";
+import {
+  CALENDAR_LABELS,
+  setCalendarKind,
+  useCalendarKind,
+  useEvents,
+  useToday,
+  type CalendarKind,
+} from "@/lib/events-store";
 import EventDialog from "./EventDialog";
+import TodayDialog from "./TodayDialog";
 
 const MAX_CHIPS = 3;
 
 type Editing = { event: CalendarEvent; isNew: boolean };
 
 export default function Calendar() {
-  const events = useEvents();
+  const kind = useCalendarKind();
+  const { events, error } = useEvents(kind);
   const today = useToday();
 
   // null の間は「今日」を基準にする
@@ -29,6 +38,9 @@ export default function Calendar() {
   const [selected, setSelected] = useState<string | null>(null);
   const [editing, setEditing] = useState<Editing | null>(null);
   const closeDialog = useCallback(() => setEditing(null), []);
+  // 起動時に「本日の予定」を表示する
+  const [showToday, setShowToday] = useState(true);
+  const closeToday = useCallback(() => setShowToday(false), []);
 
   const eventsByDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
@@ -41,7 +53,7 @@ export default function Calendar() {
     return map;
   }, [events]);
 
-  if (!today || !events) {
+  if (!today) {
     return (
       <div className="flex flex-1 items-center justify-center text-zinc-500">
         読み込み中…
@@ -83,12 +95,57 @@ export default function Calendar() {
     });
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 p-4 lg:flex-row">
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 p-4">
+      {/* カレンダーの切り替え */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div
+          role="tablist"
+          aria-label="表示するカレンダー"
+          className="inline-flex rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-950"
+        >
+          {(["shared", "personal"] as CalendarKind[]).map((k) => (
+            <button
+              key={k}
+              role="tab"
+              aria-selected={kind === k}
+              onClick={() => setCalendarKind(k)}
+              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+                kind === k
+                  ? "bg-blue-600 text-white"
+                  : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              }`}
+            >
+              {CALENDAR_LABELS[k]}カレンダー
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-zinc-500">
+          {kind === "shared"
+            ? "みんなで共有する予定です。追加・変更は全員に表示されます。"
+            : "自分だけの予定です。このブラウザにのみ保存されます。"}
+        </p>
+      </div>
+
+      {error && (
+        <p
+          role="alert"
+          className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300"
+        >
+          {error}
+        </p>
+      )}
+
+      <div className="flex flex-1 flex-col gap-4 lg:flex-row">
       {/* 月表示 */}
       <section className="flex flex-1 flex-col rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <header className="flex items-center gap-2 border-b border-zinc-200 p-3 dark:border-zinc-800">
           <h2 className="mr-auto text-xl font-semibold tabular-nums">
             {year}年{month + 1}月
+            {!events && (
+              <span className="ml-2 text-sm font-normal text-zinc-500">
+                読み込み中…
+              </span>
+            )}
           </h2>
           <button
             onClick={goToday}
@@ -142,7 +199,7 @@ export default function Calendar() {
               <button
                 key={key}
                 onClick={() => setSelected(key)}
-                onDoubleClick={() => openNew(key)}
+                onDoubleClick={() => events && openNew(key)}
                 aria-label={`${formatLongDate(key)}、予定${dayEvents.length}件`}
                 aria-pressed={isSelected}
                 className={`flex min-h-20 flex-col items-stretch gap-1 border-b border-r border-zinc-100 p-1 text-left transition-colors dark:border-zinc-900 sm:min-h-24 ${
@@ -189,10 +246,16 @@ export default function Calendar() {
       {/* 選択日の予定 */}
       <aside className="flex w-full flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950 lg:w-80">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="font-semibold">{formatLongDate(selectedKey)}</h3>
+          <div>
+            <p className="text-xs text-zinc-500">
+              {CALENDAR_LABELS[kind]}カレンダー
+            </p>
+            <h3 className="font-semibold">{formatLongDate(selectedKey)}</h3>
+          </div>
           <button
             onClick={() => openNew(selectedKey)}
-            className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+            disabled={!events}
+            className="rounded-lg disabled:opacity-50 bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
           >
             ＋ 追加
           </button>
@@ -235,13 +298,17 @@ export default function Calendar() {
         )}
 
         <p className="mt-auto text-xs text-zinc-400">
-          日付をダブルクリックでも予定を追加できます。予定はこのブラウザに保存されます。
+          日付をダブルクリックでも予定を追加できます。
         </p>
       </aside>
+      </div>
+
+      {showToday && <TodayDialog today={today} onClose={closeToday} />}
 
       {editing && (
         <EventDialog
-          key={editing.event.id}
+          key={`${kind}:${editing.event.id}`}
+          kind={kind}
           event={editing.event}
           isNew={editing.isNew}
           onClose={closeDialog}

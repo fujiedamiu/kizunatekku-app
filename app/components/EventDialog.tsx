@@ -6,17 +6,37 @@ import {
   type CalendarEvent,
   type EventColor,
 } from "@/lib/calendar";
-import { deleteEvent, saveEvent } from "@/lib/events-store";
+import {
+  CALENDAR_LABELS,
+  deleteEvent,
+  saveEvent,
+  type CalendarKind,
+} from "@/lib/events-store";
 
 type Props = {
+  kind: CalendarKind;
   event: CalendarEvent;
   isNew: boolean;
   onClose: () => void;
 };
 
-export default function EventDialog({ event, isNew, onClose }: Props) {
+export default function EventDialog({ kind, event, isNew, onClose }: Props) {
   const [draft, setDraft] = useState<CalendarEvent>(event);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  /** 保存・削除を実行し、成功したら閉じる。失敗したらダイアログに理由を出す */
+  const run = async (action: () => Promise<void>) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await action();
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "保存できませんでした");
+      setBusy(false);
+    }
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -42,20 +62,20 @@ export default function EventDialog({ event, isNew, onClose }: Props) {
       setError("終了時刻は開始時刻より後にしてください");
       return;
     }
-    saveEvent({
-      ...draft,
-      title,
-      memo: draft.memo?.trim() || undefined,
-      start: draft.allDay ? undefined : draft.start,
-      end: draft.allDay ? undefined : draft.end,
-    });
-    onClose();
+    void run(() =>
+      saveEvent(kind, {
+        ...draft,
+        title,
+        memo: draft.memo?.trim() || undefined,
+        start: draft.allDay ? undefined : draft.start,
+        end: draft.allDay ? undefined : draft.end,
+      }),
+    );
   };
 
   const handleDelete = () => {
     if (window.confirm(`「${event.title}」を削除しますか？`)) {
-      deleteEvent(event.id);
-      onClose();
+      void run(() => deleteEvent(kind, event.id));
     }
   };
 
@@ -77,6 +97,9 @@ export default function EventDialog({ event, isNew, onClose }: Props) {
       >
         <h2 id="event-dialog-title" className="text-lg font-semibold">
           {isNew ? "予定を追加" : "予定を編集"}
+          <span className="ml-2 align-middle text-xs font-normal text-zinc-500">
+            {CALENDAR_LABELS[kind]}カレンダー
+          </span>
         </h2>
 
         <label className="block space-y-1">
@@ -170,6 +193,7 @@ export default function EventDialog({ event, isNew, onClose }: Props) {
             <button
               type="button"
               onClick={handleDelete}
+              disabled={busy}
               className="rounded-lg px-3 py-2 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10"
             >
               削除
@@ -185,7 +209,8 @@ export default function EventDialog({ event, isNew, onClose }: Props) {
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              disabled={busy}
+              className="rounded-lg disabled:opacity-50 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
               保存
             </button>
