@@ -25,8 +25,9 @@ const ja = {
   "calendar.switcherLabel": "表示するカレンダー",
   "calendar.sharedDesc":
     "みんなで共有する予定です。追加・変更は全員に表示されます。",
-  "calendar.personalDesc":
-    "自分だけの予定と、時間割の授業です。予定はこのブラウザに保存されます。",
+  "calendar.personalDesc": "自分だけの予定です。予定はこのブラウザに保存されます。",
+  "calendar.timetableDesc": "自分の時間割と、表示中の他の人の時間割です。",
+  "calendar.timetableEmpty": "まだ時間割がありません。",
   "calendar.prevMonth": "前の月",
   "calendar.nextMonth": "次の月",
   "calendar.dayAria": "{date}、予定{n}件",
@@ -46,6 +47,7 @@ const ja = {
   "menu.todaySchedule": "本日の予定",
   "menu.goToday": "今日の日付に移動",
   "menu.timetable": "時間割",
+  "menu.timetableView": "時間割を表示",
   "menu.timetableManage": "時間割の作成・検索",
   "menu.settings": "設定",
   "menu.language": "言語",
@@ -149,7 +151,7 @@ const ja = {
   "tt.ownAlwaysShown": "自分の時間割（常に表示）",
   "tt.cardMeta": "作成：{owner}・{start}〜{end}・{n}コマ",
   "tt.showContents": "中身を見る",
-  "tt.subscribe": "自分のカレンダーに表示",
+  "tt.subscribe": "自分の時間割に表示",
   "tt.unsubscribe": "表示をやめる",
   "tt.deleteConfirm":
     "「{title}」を削除しますか？\n表示している他の人のカレンダーからも消えます。",

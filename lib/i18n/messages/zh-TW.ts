@@ -21,8 +21,9 @@ const zhTW: Messages = {
   "calendar.switcherLabel": "要顯示的行事曆",
   "calendar.sharedDesc":
     "大家共用的行程。新增或修改的內容所有人都看得到。",
-  "calendar.personalDesc":
-    "只屬於你自己的行程與課表中的課程。行程會儲存在這個瀏覽器中。",
+  "calendar.personalDesc": "只屬於你自己的行程。行程會儲存在這個瀏覽器中。",
+  "calendar.timetableDesc": "你的課表，以及正在顯示的他人課表。",
+  "calendar.timetableEmpty": "還沒有課表。",
   "calendar.prevMonth": "上個月",
   "calendar.nextMonth": "下個月",
   "calendar.dayAria": "{date}，{n}個行程",
@@ -41,6 +42,7 @@ const zhTW: Messages = {
   "menu.todaySchedule": "今日行程",
   "menu.goToday": "跳到今天",
   "menu.timetable": "課表",
+  "menu.timetableView": "查看課表",
   "menu.timetableManage": "建立 / 搜尋課表",
   "menu.settings": "設定",
   "menu.language": "語言",
@@ -137,7 +139,7 @@ const zhTW: Messages = {
   "tt.ownAlwaysShown": "我的課表（一律顯示）",
   "tt.cardMeta": "建立者：{owner}・{start}～{end}・{n}堂課",
   "tt.showContents": "查看內容",
-  "tt.subscribe": "顯示在我的行事曆",
+  "tt.subscribe": "顯示在我的課表",
   "tt.unsubscribe": "取消顯示",
   "tt.deleteConfirm":
     "確定要刪除「{title}」嗎？\n它也會從正在顯示此課表的其他人的行事曆中消失。",

@@ -21,8 +21,9 @@ const id: Messages = {
   "calendar.switcherLabel": "Kalender yang ditampilkan",
   "calendar.sharedDesc":
     "Acara yang dibagikan dengan semua orang. Penambahan dan perubahan akan terlihat oleh semua pengguna.",
-  "calendar.personalDesc":
-    "Acara pribadi Anda dan kelas dari jadwal kuliah. Acara disimpan di browser ini.",
+  "calendar.personalDesc": "Acara pribadi Anda. Acara disimpan di browser ini.",
+  "calendar.timetableDesc": "Jadwal kuliah Anda dan jadwal orang lain yang ditampilkan.",
+  "calendar.timetableEmpty": "Belum ada jadwal kuliah.",
   "calendar.prevMonth": "Bulan sebelumnya",
   "calendar.nextMonth": "Bulan berikutnya",
   "calendar.dayAria": "{date}, {n} acara",
@@ -42,6 +43,7 @@ const id: Messages = {
   "menu.todaySchedule": "Jadwal hari ini",
   "menu.goToday": "Ke tanggal hari ini",
   "menu.timetable": "Jadwal Kuliah",
+  "menu.timetableView": "Lihat jadwal kuliah",
   "menu.timetableManage": "Buat / cari jadwal kuliah",
   "menu.settings": "Pengaturan",
   "menu.language": "Bahasa",
@@ -142,7 +144,7 @@ const id: Messages = {
   "tt.ownAlwaysShown": "Jadwal kuliah Anda (selalu ditampilkan)",
   "tt.cardMeta": "Oleh {owner} · {start} – {end} · {n} kelas",
   "tt.showContents": "Lihat isi",
-  "tt.subscribe": "Tampilkan di kalender saya",
+  "tt.subscribe": "Tampilkan di jadwal saya",
   "tt.unsubscribe": "Berhenti menampilkan",
   "tt.deleteConfirm":
     "Hapus “{title}”?\nJadwal ini juga akan hilang dari kalender orang lain yang menampilkannya.",

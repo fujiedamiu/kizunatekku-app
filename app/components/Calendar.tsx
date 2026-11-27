@@ -28,6 +28,7 @@ import TodayDialog from "./TodayDialog";
 import AppMenu from "./AppMenu";
 import SearchBox from "./SearchBox";
 import TimetableManager from "./TimetableManager";
+import TimetableView from "./TimetableView";
 import ReminderWatcher from "./ReminderWatcher";
 
 const MAX_CHIPS = 3;
@@ -87,6 +88,13 @@ export default function Calendar({
   const closeToday = useCallback(() => setShowToday(false), []);
   const [showTimetables, setShowTimetables] = useState(false);
   const closeTimetables = useCallback(() => setShowTimetables(false), []);
+  // 「時間割」タブ (週の時間割表を表示) を開いているか
+  const [timetableTabOpen, setTimetableTab] = useState(false);
+  const timetableTab = !guest && timetableTabOpen;
+  const selectKind = useCallback((k: CalendarKind) => {
+    setTimetableTab(false);
+    setCalendarKind(k);
+  }, []);
 
   const eventsByDate = useMemo(() => {
     const map = new Map<string, CalendarEvent[]>();
@@ -106,6 +114,7 @@ export default function Calendar({
   /** 検索結果などから、指定カレンダーの指定日へ移動する */
   const jumpTo = useCallback((k: CalendarKind, date: string) => {
     const d = parseDateKey(date);
+    setTimetableTab(false);
     setCalendarKind(k);
     setView({ year: d.getFullYear(), month: d.getMonth() });
     setSelected(date);
@@ -117,7 +126,9 @@ export default function Calendar({
         <AppMenu
           user={user}
           kind={kind}
-          onSelectKind={setCalendarKind}
+          timetableTab={timetableTab}
+          onSelectKind={selectKind}
+          onShowTimetableTab={() => setTimetableTab(true)}
           onShowToday={() => setShowToday(true)}
           onGoToday={goToday}
           onOpenTimetables={() => setShowTimetables(true)}
@@ -161,22 +172,13 @@ export default function Calendar({
   const selectedKey = selected ?? today;
   const days = monthGrid(year, month);
 
-  // 時間割の授業は個人カレンダーに表示する (表示中の月 + 選択日 + 今日の分だけ展開)
-  const classesByDate = new Map<string, ClassOccurrence[]>();
-  const addClasses = (from: string, to: string) => {
-    for (const c of expandTimetables(timetables ?? [], from, to)) {
-      if (classesByDate.get(c.date)?.some((x) => x.id === c.id)) continue;
-      classesByDate.set(c.date, [...(classesByDate.get(c.date) ?? []), c]);
-    }
-  };
-  addClasses(toDateKey(days[0]), toDateKey(days[days.length - 1]));
-  addClasses(selectedKey, selectedKey);
-  addClasses(today, today);
-  const todayClasses = classesByDate.get(today) ?? [];
+  // 時間割の授業はカレンダーには並べず (見づらくなるため)、「時間割」タブで見る。
+  // 今日の授業だけは「本日の予定」に出す
+  const todayClasses = expandTimetables(timetables ?? [], today, today);
 
   const itemsFor = (key: string): DayItem[] =>
-    sortItems([
-      ...(eventsByDate.get(key) ?? []).map(
+    sortItems(
+      (eventsByDate.get(key) ?? []).map(
         (event): DayItem => ({
           type: "event",
           key: event.id,
@@ -184,10 +186,7 @@ export default function Calendar({
           event,
         }),
       ),
-      ...(kind === "personal" ? (classesByDate.get(key) ?? []) : []).map(
-        (cls): DayItem => ({ type: "class", key: cls.id, start: cls.start, cls }),
-      ),
-    ]);
+    );
 
   const selectedItems = itemsFor(selectedKey);
 
@@ -233,30 +232,52 @@ export default function Calendar({
             aria-label={t("calendar.switcherLabel")}
             className="inline-flex rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-950"
           >
-            {(["shared", "personal"] as CalendarKind[]).map((k) => (
-              <button
-                key={k}
-                role="tab"
-                aria-selected={kind === k}
-                onClick={() => setCalendarKind(k)}
-                className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-                  kind === k
-                    ? "bg-blue-600 text-white"
-                    : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                }`}
-              >
-                {t(k === "shared" ? "calendar.shared" : "calendar.personal")}
-              </button>
-            ))}
+            {(["shared", "personal", "timetable"] as const).map((k) => {
+              const active =
+                k === "timetable" ? timetableTab : !timetableTab && kind === k;
+              return (
+                <button
+                  key={k}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() =>
+                    k === "timetable" ? setTimetableTab(true) : selectKind(k)
+                  }
+                  className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+                    active
+                      ? "bg-blue-600 text-white"
+                      : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                  }`}
+                >
+                  {t(
+                    k === "shared"
+                      ? "calendar.shared"
+                      : k === "personal"
+                        ? "calendar.personal"
+                        : "today.timetable",
+                  )}
+                </button>
+              );
+            })}
           </div>
           <p className="text-xs text-zinc-500">
-            {kind === "shared"
-              ? t("calendar.sharedDesc")
-              : t("calendar.personalDesc")}
+            {timetableTab
+              ? t("calendar.timetableDesc")
+              : kind === "shared"
+                ? t("calendar.sharedDesc")
+                : t("calendar.personalDesc")}
           </p>
         </div>
         )}
 
+        {timetableTab ? (
+          <TimetableView
+            timetables={timetables}
+            today={today}
+            onManage={() => setShowTimetables(true)}
+          />
+        ) : (
+        <>
         {error && (
           <p
             role="alert"
@@ -446,12 +467,12 @@ export default function Calendar({
             {!guest && (
               <p className="mt-auto text-xs text-zinc-400">
                 {t("calendar.hintDoubleClick")}
-                {kind === "personal" &&
-                  ` ${t("calendar.hintTimetable")}`}
               </p>
             )}
           </aside>
         </div>
+        </>
+        )}
 
         {showToday && (
           <TodayDialog

@@ -21,8 +21,9 @@ const vi: Messages = {
   "calendar.switcherLabel": "Lịch hiển thị",
   "calendar.sharedDesc":
     "Sự kiện được chia sẻ với mọi người. Mọi thay đổi hoặc sự kiện bạn thêm đều hiển thị cho tất cả.",
-  "calendar.personalDesc":
-    "Sự kiện riêng của bạn và các tiết học trong thời khóa biểu. Sự kiện được lưu trên trình duyệt này.",
+  "calendar.personalDesc": "Sự kiện riêng của bạn. Sự kiện được lưu trên trình duyệt này.",
+  "calendar.timetableDesc": "Thời khóa biểu của bạn và của người khác mà bạn đang hiển thị.",
+  "calendar.timetableEmpty": "Chưa có thời khóa biểu.",
   "calendar.prevMonth": "Tháng trước",
   "calendar.nextMonth": "Tháng sau",
   "calendar.dayAria": "{date}, {n} sự kiện",
@@ -41,6 +42,7 @@ const vi: Messages = {
   "menu.todaySchedule": "Lịch hôm nay",
   "menu.goToday": "Đến ngày hôm nay",
   "menu.timetable": "Thời khóa biểu",
+  "menu.timetableView": "Xem thời khóa biểu",
   "menu.timetableManage": "Tạo / tìm thời khóa biểu",
   "menu.settings": "Cài đặt",
   "menu.language": "Ngôn ngữ",
@@ -139,7 +141,7 @@ const vi: Messages = {
   "tt.ownAlwaysShown": "Thời khóa biểu của bạn (luôn hiển thị)",
   "tt.cardMeta": "Người tạo: {owner} · {start} – {end} · {n} tiết",
   "tt.showContents": "Xem nội dung",
-  "tt.subscribe": "Hiển thị trên lịch của tôi",
+  "tt.subscribe": "Hiển thị trong thời khóa biểu của tôi",
   "tt.unsubscribe": "Ngừng hiển thị",
   "tt.deleteConfirm":
     "Xóa “{title}”?\nThời khóa biểu này cũng sẽ biến mất khỏi lịch của những người đang hiển thị nó.",

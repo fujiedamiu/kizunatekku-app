@@ -21,8 +21,9 @@ const zhCN: Messages = {
   "calendar.switcherLabel": "显示的日历",
   "calendar.sharedDesc":
     "大家共享的日程。添加或修改的内容所有人都能看到。",
-  "calendar.personalDesc":
-    "只属于你自己的日程和课表中的课程。日程保存在此浏览器中。",
+  "calendar.personalDesc": "只属于你自己的日程。日程保存在此浏览器中。",
+  "calendar.timetableDesc": "你的课表，以及正在显示的他人的课表。",
+  "calendar.timetableEmpty": "还没有课表。",
   "calendar.prevMonth": "上个月",
   "calendar.nextMonth": "下个月",
   "calendar.dayAria": "{date}，{n}个日程",
@@ -41,6 +42,7 @@ const zhCN: Messages = {
   "menu.todaySchedule": "今日日程",
   "menu.goToday": "跳转到今天",
   "menu.timetable": "课表",
+  "menu.timetableView": "查看课表",
   "menu.timetableManage": "创建 / 搜索课表",
   "menu.settings": "设置",
   "menu.language": "语言",
@@ -137,7 +139,7 @@ const zhCN: Messages = {
   "tt.ownAlwaysShown": "我的课表（始终显示）",
   "tt.cardMeta": "创建者：{owner}・{start}～{end}・{n}节课",
   "tt.showContents": "查看内容",
-  "tt.subscribe": "显示在我的日历中",
+  "tt.subscribe": "显示在我的课表中",
   "tt.unsubscribe": "取消显示",
   "tt.deleteConfirm":
     "确定要删除“{title}”吗？\n它也会从正在显示该课表的其他人的日历中消失。",

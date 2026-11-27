@@ -21,8 +21,9 @@ const ne: Messages = {
   "calendar.switcherLabel": "देखाउने क्यालेन्डर",
   "calendar.sharedDesc":
     "सबैसँग साझा गरिएका कार्यक्रमहरू। तपाईंले थपेको वा बदलेको कुरा सबैलाई देखिन्छ।",
-  "calendar.personalDesc":
-    "तपाईंका आफ्नै कार्यक्रम र समय तालिकाका कक्षाहरू। कार्यक्रमहरू यही ब्राउजरमा सेभ हुन्छन्।",
+  "calendar.personalDesc": "तपाईंका आफ्नै कार्यक्रमहरू। कार्यक्रमहरू यही ब्राउजरमा सुरक्षित हुन्छन्।",
+  "calendar.timetableDesc": "तपाईंका समय तालिका र देखाइरहेका अरूका समय तालिका।",
+  "calendar.timetableEmpty": "अहिलेसम्म कुनै समय तालिका छैन।",
   "calendar.prevMonth": "अघिल्लो महिना",
   "calendar.nextMonth": "अर्को महिना",
   "calendar.dayAria": "{date}, {n} वटा कार्यक्रम",
@@ -42,6 +43,7 @@ const ne: Messages = {
   "menu.todaySchedule": "आजका कार्यक्रम",
   "menu.goToday": "आजको मितिमा जानुहोस्",
   "menu.timetable": "समय तालिका",
+  "menu.timetableView": "समय तालिका हेर्नुहोस्",
   "menu.timetableManage": "समय तालिका बनाउनुहोस् / खोज्नुहोस्",
   "menu.settings": "सेटिङ",
   "menu.language": "भाषा",
@@ -142,7 +144,7 @@ const ne: Messages = {
   "tt.ownAlwaysShown": "तपाईंको समय तालिका (सधैं देखिन्छ)",
   "tt.cardMeta": "बनाउने: {owner} · {start} – {end} · {n} कक्षा",
   "tt.showContents": "विवरण हेर्नुहोस्",
-  "tt.subscribe": "मेरो क्यालेन्डरमा देखाउनुहोस्",
+  "tt.subscribe": "मेरो समय तालिकामा देखाउनुहोस्",
   "tt.unsubscribe": "देखाउन बन्द गर्नुहोस्",
   "tt.deleteConfirm":
     "“{title}” मेटाउने हो?\nयसलाई देखाइरहेका अरूको क्यालेन्डरबाट पनि हट्नेछ।",

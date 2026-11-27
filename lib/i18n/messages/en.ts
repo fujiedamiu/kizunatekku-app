@@ -21,8 +21,9 @@ const en: Messages = {
   "calendar.switcherLabel": "Calendar to show",
   "calendar.sharedDesc":
     "Events shared with everyone. Anything you add or change is visible to all users.",
-  "calendar.personalDesc":
-    "Your own events and timetable classes. Events are saved in this browser.",
+  "calendar.personalDesc": "Your own events. Events are saved in this browser.",
+  "calendar.timetableDesc": "Your timetables and others' timetables you are showing.",
+  "calendar.timetableEmpty": "No timetables yet.",
   "calendar.prevMonth": "Previous month",
   "calendar.nextMonth": "Next month",
   "calendar.dayAria": "{date}, {n} events",
@@ -41,6 +42,7 @@ const en: Messages = {
   "menu.todaySchedule": "Today’s schedule",
   "menu.goToday": "Go to today",
   "menu.timetable": "Timetable",
+  "menu.timetableView": "View timetable",
   "menu.timetableManage": "Create / find timetables",
   "menu.settings": "Settings",
   "menu.language": "Language",
@@ -138,7 +140,7 @@ const en: Messages = {
   "tt.ownAlwaysShown": "Your timetable (always shown)",
   "tt.cardMeta": "By {owner} · {start} – {end} · {n} classes",
   "tt.showContents": "View",
-  "tt.subscribe": "Show in my calendar",
+  "tt.subscribe": "Show in my timetable",
   "tt.unsubscribe": "Stop showing",
   "tt.deleteConfirm":
     "Delete “{title}”?\nIt will also disappear from the calendars of people who are showing it.",

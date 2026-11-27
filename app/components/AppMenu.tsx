@@ -24,7 +24,10 @@ type Props = {
   user: User | null;
   onLogin?: () => void;
   kind: CalendarKind;
+  /** 「時間割」タブを開いているか */
+  timetableTab?: boolean;
   onSelectKind: (kind: CalendarKind) => void;
+  onShowTimetableTab?: () => void;
   onShowToday: () => void;
   onGoToday: () => void;
   onOpenTimetables: () => void;
@@ -37,7 +40,9 @@ const KINDS: CalendarKind[] = ["shared", "personal"];
 export default function AppMenu({
   user,
   kind,
+  timetableTab = false,
   onSelectKind,
+  onShowTimetableTab,
   onShowToday,
   onGoToday,
   onOpenTimetables,
@@ -154,8 +159,8 @@ export default function AppMenu({
                 <button
                   key={k}
                   onClick={choose(() => onSelectKind(k))}
-                  aria-current={kind === k ? "true" : undefined}
-                  className={itemClass(kind === k)}
+                  aria-current={!timetableTab && kind === k ? "true" : undefined}
+                  className={itemClass(!timetableTab && kind === k)}
                 >
                   <span aria-hidden="true">{k === "shared" ? "👥" : "👤"}</span>
                   {t(k === "shared" ? "calendar.shared" : "calendar.personal")}
@@ -182,6 +187,14 @@ export default function AppMenu({
                 <h2 className="px-3 text-xs font-semibold text-zinc-500">
                   {t("menu.timetable")}
                 </h2>
+                <button
+                  onClick={choose(() => onShowTimetableTab?.())}
+                  aria-current={timetableTab ? "true" : undefined}
+                  className={itemClass(timetableTab)}
+                >
+                  <span aria-hidden="true">🗓️</span>
+                  {t("menu.timetableView")}
+                </button>
                 <button
                   onClick={choose(onOpenTimetables)}
                   className={itemClass()}

@@ -21,8 +21,9 @@ const ko: Messages = {
   "calendar.switcherLabel": "표시할 캘린더",
   "calendar.sharedDesc":
     "모두가 함께 쓰는 일정이에요. 추가하거나 변경한 내용은 모든 사람에게 표시돼요.",
-  "calendar.personalDesc":
-    "나만의 일정과 시간표 수업이에요. 일정은 이 브라우저에 저장돼요.",
+  "calendar.personalDesc": "나만의 일정이에요. 일정은 이 브라우저에 저장돼요.",
+  "calendar.timetableDesc": "내 시간표와 표시 중인 다른 사람의 시간표예요.",
+  "calendar.timetableEmpty": "아직 시간표가 없어요.",
   "calendar.prevMonth": "이전 달",
   "calendar.nextMonth": "다음 달",
   "calendar.dayAria": "{date}, 일정 {n}개",
@@ -41,6 +42,7 @@ const ko: Messages = {
   "menu.todaySchedule": "오늘의 일정",
   "menu.goToday": "오늘 날짜로 이동",
   "menu.timetable": "시간표",
+  "menu.timetableView": "시간표 보기",
   "menu.timetableManage": "시간표 만들기·찾기",
   "menu.settings": "설정",
   "menu.language": "언어",
@@ -137,7 +139,7 @@ const ko: Messages = {
   "tt.ownAlwaysShown": "내 시간표 (항상 표시)",
   "tt.cardMeta": "작성: {owner} · {start}~{end} · {n}개 수업",
   "tt.showContents": "내용 보기",
-  "tt.subscribe": "내 캘린더에 표시",
+  "tt.subscribe": "내 시간표에 표시",
   "tt.unsubscribe": "표시 해제",
   "tt.deleteConfirm":
     "‘{title}’을(를) 삭제할까요?\n이 시간표를 표시 중인 다른 사람의 캘린더에서도 사라져요.",

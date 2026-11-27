@@ -248,12 +248,17 @@ export function TimetableGrid({
   periods,
   slotAt,
   onCellClick,
+  highlightWeekday,
 }: {
   periods: Period[];
   slotAt: (weekday: number, period: number) => TimetableSlot | undefined;
   onCellClick?: (weekday: number, period: number) => void;
+  /** 今日の曜日など、目立たせる曜日の列 */
+  highlightWeekday?: number;
 }) {
   const { t, weekdayShort, weekdayLong } = useI18n();
+  const hl = (w: number) =>
+    w === highlightWeekday ? "bg-blue-50 dark:bg-blue-500/10" : "";
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[480px] table-fixed border-collapse text-xs">
@@ -263,7 +268,14 @@ export function TimetableGrid({
             {TIMETABLE_WEEKDAYS.map((w) => (
               <th
                 key={w}
-                className={`py-1 font-medium ${w === 6 ? "text-blue-600" : "text-zinc-500"}`}
+                aria-current={w === highlightWeekday ? "date" : undefined}
+                className={`rounded-t-md py-1 font-medium ${hl(w)} ${
+                  w === highlightWeekday
+                    ? "font-bold text-blue-700 dark:text-blue-300"
+                    : w === 6
+                      ? "text-blue-600"
+                      : "text-zinc-500"
+                }`}
               >
                 {weekdayShort(w)}
               </th>
@@ -300,7 +312,7 @@ export function TimetableGrid({
                 return (
                   <td
                     key={w}
-                    className="h-14 border-t border-zinc-100 p-0.5 dark:border-zinc-800"
+                    className={`h-14 border-t border-zinc-100 p-0.5 dark:border-zinc-800 ${hl(w)}`}
                   >
                     {onCellClick ? (
                       <button
