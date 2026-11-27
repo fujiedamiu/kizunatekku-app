@@ -1,6 +1,14 @@
 import type { Translate } from "./i18n/core";
 
-export type EventColor = "blue" | "green" | "red" | "amber" | "purple";
+export type EventColor =
+  | "blue"
+  | "green"
+  | "red"
+  | "amber"
+  | "purple"
+  | "orange"
+  | "pink"
+  | "cyan";
 
 export type CalendarEvent = {
   id: string;
@@ -57,6 +65,22 @@ export const COLORS: Record<
     label: "紫",
     chip: "bg-violet-100 text-violet-800 dark:bg-violet-500/20 dark:text-violet-200",
     dot: "bg-violet-500",
+  },
+  orange: {
+    label: "オレンジ",
+    chip: "bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-200",
+    dot: "bg-orange-500",
+  },
+  pink: {
+    label: "ピンク",
+    // 赤 (rose) と見分けやすいよう、赤紫寄りの色にする
+    chip: "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-500/25 dark:text-fuchsia-200",
+    dot: "bg-fuchsia-500",
+  },
+  cyan: {
+    label: "水色",
+    chip: "bg-cyan-100 text-cyan-800 dark:bg-cyan-500/20 dark:text-cyan-200",
+    dot: "bg-cyan-500",
   },
 };
 

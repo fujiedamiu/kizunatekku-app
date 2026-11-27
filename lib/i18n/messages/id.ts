@@ -93,6 +93,9 @@ const id: Messages = {
   "color.red": "Merah",
   "color.amber": "Kuning",
   "color.purple": "Ungu",
+  "color.orange": "Oranye",
+  "color.pink": "Merah muda",
+  "color.cyan": "Biru muda",
 
   "today.title": "Jadwal hari ini",
   "today.count": "{n} item",

@@ -92,6 +92,9 @@ const vi: Messages = {
   "color.red": "Đỏ",
   "color.amber": "Vàng",
   "color.purple": "Tím",
+  "color.orange": "Cam",
+  "color.pink": "Hồng",
+  "color.cyan": "Xanh nhạt",
 
   "today.title": "Lịch hôm nay",
   "today.count": "{n} mục",

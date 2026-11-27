@@ -93,6 +93,9 @@ const ne: Messages = {
   "color.red": "रातो",
   "color.amber": "पहेँलो",
   "color.purple": "बैजनी",
+  "color.orange": "सुन्तला",
+  "color.pink": "गुलाबी",
+  "color.cyan": "हल्का निलो",
 
   "today.title": "आजका कार्यक्रम",
   "today.count": "{n} वटा",

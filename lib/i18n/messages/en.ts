@@ -92,6 +92,9 @@ const en: Messages = {
   "color.red": "Red",
   "color.amber": "Yellow",
   "color.purple": "Purple",
+  "color.orange": "Orange",
+  "color.pink": "Pink",
+  "color.cyan": "Light blue",
 
   "today.title": "Today’s schedule",
   "today.count": "{n} items",

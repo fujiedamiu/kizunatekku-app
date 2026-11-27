@@ -92,6 +92,9 @@ const ko: Messages = {
   "color.red": "빨강",
   "color.amber": "노랑",
   "color.purple": "보라",
+  "color.orange": "주황",
+  "color.pink": "분홍",
+  "color.cyan": "하늘색",
 
   "today.title": "오늘의 일정",
   "today.count": "{n}개",

@@ -92,6 +92,9 @@ const zhTW: Messages = {
   "color.red": "紅",
   "color.amber": "黃",
   "color.purple": "紫",
+  "color.orange": "橘色",
+  "color.pink": "粉紅色",
+  "color.cyan": "淺藍色",
 
   "today.title": "今日行程",
   "today.count": "{n}項",

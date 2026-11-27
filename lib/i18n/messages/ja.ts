@@ -100,6 +100,9 @@ const ja = {
   "color.red": "赤",
   "color.amber": "黄",
   "color.purple": "紫",
+  "color.orange": "オレンジ",
+  "color.pink": "ピンク",
+  "color.cyan": "水色",
 
   // 本日の予定
   "today.title": "本日の予定",

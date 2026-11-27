@@ -92,6 +92,9 @@ const zhCN: Messages = {
   "color.red": "红",
   "color.amber": "黄",
   "color.purple": "紫",
+  "color.orange": "橙色",
+  "color.pink": "粉色",
+  "color.cyan": "浅蓝色",
 
   "today.title": "今日日程",
   "today.count": "{n}项",
