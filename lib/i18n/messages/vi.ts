@@ -44,6 +44,9 @@ const vi: Messages = {
   "menu.timetableManage": "Tạo / tìm thời khóa biểu",
   "menu.settings": "Cài đặt",
   "menu.language": "Ngôn ngữ",
+  "menu.classNotify": "Thông báo tiết học (trước 5 phút · lúc bắt đầu)",
+  "menu.on": "Bật",
+  "menu.off": "Tắt",
   "menu.logout": "Đăng xuất",
   "menu.logoutConfirm": "Bạn có muốn đăng xuất không?",
 
@@ -80,6 +83,7 @@ const vi: Messages = {
   "reminder.title": "{left}: {title}",
   "reminder.body": "Bắt đầu lúc {time}",
   "reminder.dismiss": "Đóng nhắc nhở",
+  "classReminder.start": "Đã đến giờ học. Vui lòng điểm danh.",
 
   "color.blue": "Xanh dương",
   "color.green": "Xanh lá",

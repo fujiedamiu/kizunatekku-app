@@ -1,7 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { askConfirm } from "@/lib/confirm-store";
+import {
+  getClassNotify,
+  requestNotificationPermission,
+  setClassNotify,
+  subscribeClassNotify,
+} from "@/lib/notifications";
 import type { CalendarKind } from "@/lib/events-store";
 import { LANGUAGES, useI18n } from "@/lib/i18n";
 import type { User } from "@/lib/user";
@@ -70,6 +82,25 @@ export default function AppMenu({
     }`;
 
   const currentLanguage = LANGUAGES.find((l) => l.code === lang)?.native;
+
+  const classNotify = useSyncExternalStore(
+    subscribeClassNotify,
+    getClassNotify,
+    () => false,
+  );
+  const [permissionNote, setPermissionNote] = useState<string | null>(null);
+  /** オンにするときに通知の許可を求める (ボタンを押した操作の中で呼ぶ必要がある) */
+  const toggleClassNotify = async () => {
+    const next = !classNotify;
+    setClassNotify(next);
+    setPermissionNote(null);
+    if (!next) return;
+    const permission = await requestNotificationPermission();
+    if (permission === "unsupported")
+      setPermissionNote(t("event.notifyUnsupported"));
+    else if (permission !== "granted")
+      setPermissionNote(t("event.notifyDenied"));
+  };
 
   return (
     <>
@@ -178,6 +209,27 @@ export default function AppMenu({
                 </span>
                 <span className="text-xs text-zinc-500">{currentLanguage}</span>
               </button>
+              {user && (
+                <button
+                  role="switch"
+                  aria-checked={classNotify}
+                  onClick={toggleClassNotify}
+                  className={itemClass()}
+                >
+                  <span aria-hidden="true">🔔</span>
+                  <span className="flex-1">{t("menu.classNotify")}</span>
+                  <span
+                    className={`text-xs font-medium ${classNotify ? "text-blue-600 dark:text-blue-400" : "text-zinc-500"}`}
+                  >
+                    {t(classNotify ? "menu.on" : "menu.off")}
+                  </span>
+                </button>
+              )}
+              {user && classNotify && permissionNote && (
+                <p className="px-3 text-xs text-amber-700 dark:text-amber-400">
+                  {permissionNote}
+                </p>
+              )}
             </section>
 
             {!user ? (

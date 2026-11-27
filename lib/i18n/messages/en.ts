@@ -44,6 +44,9 @@ const en: Messages = {
   "menu.timetableManage": "Create / find timetables",
   "menu.settings": "Settings",
   "menu.language": "Language",
+  "menu.classNotify": "Class alerts (5 min before & at start)",
+  "menu.on": "On",
+  "menu.off": "Off",
   "menu.logout": "Log out",
   "menu.logoutConfirm": "Log out?",
 
@@ -80,6 +83,7 @@ const en: Messages = {
   "reminder.title": "{left}: {title}",
   "reminder.body": "Starts at {time}",
   "reminder.dismiss": "Dismiss",
+  "classReminder.start": "Class is starting. Please register your attendance.",
 
   "color.blue": "Blue",
   "color.green": "Green",

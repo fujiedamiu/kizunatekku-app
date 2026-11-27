@@ -466,7 +466,7 @@ export default function Calendar({
           <TimetableManager today={today} onClose={closeTimetables} />
         )}
 
-        <ReminderWatcher />
+        <ReminderWatcher timetables={guest ? null : timetables} />
 
         {editing && (
           <EventDialog

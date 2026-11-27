@@ -45,6 +45,9 @@ const id: Messages = {
   "menu.timetableManage": "Buat / cari jadwal kuliah",
   "menu.settings": "Pengaturan",
   "menu.language": "Bahasa",
+  "menu.classNotify": "Notifikasi kelas (5 menit sebelum & saat mulai)",
+  "menu.on": "Aktif",
+  "menu.off": "Nonaktif",
   "menu.logout": "Keluar",
   "menu.logoutConfirm": "Keluar dari akun?",
 
@@ -81,6 +84,7 @@ const id: Messages = {
   "reminder.title": "{left}: {title}",
   "reminder.body": "Mulai pukul {time}",
   "reminder.dismiss": "Tutup pengingat",
+  "classReminder.start": "Kelas dimulai. Silakan lakukan presensi.",
 
   "color.blue": "Biru",
   "color.green": "Hijau",

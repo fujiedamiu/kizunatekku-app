@@ -1,5 +1,6 @@
 import { parseDateKey, type CalendarEvent } from "./calendar";
 import type { Translate } from "./i18n/core";
+import type { ClassOccurrence } from "./timetable";
 
 /** ブラウザ通知が使えるか */
 export function notificationsSupported(): boolean {
@@ -123,13 +124,121 @@ export function reminderText(
   };
 }
 
+// ---------------------------------------------------------------------------
+// 時間割の授業の通知 (開始 5 分前と、開始時刻)
+// ---------------------------------------------------------------------------
+
+/** 授業の何分前に知らせるか */
+export const CLASS_NOTIFY_BEFORE_MIN = 5;
+/** 開始のお知らせを、開始から何分後まで出すか (少し遅れて画面を開いた場合のため) */
+const CLASS_START_GRACE_MIN = 10;
+
+export type DueClassReminder = {
+  key: string;
+  cls: ClassOccurrence;
+  /** before: 開始前のお知らせ / start: 授業開始のお知らせ */
+  phase: "before" | "start";
+  minutesLeft: number;
+};
+
+function classStart(c: ClassOccurrence): Date {
+  const d = parseDateKey(c.date);
+  const [h, m] = c.start.split(":").map(Number);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+/** 今まさに知らせるべき授業 */
+export function dueClassReminders(
+  classes: ClassOccurrence[],
+  now: Date,
+): DueClassReminder[] {
+  const due: DueClassReminder[] = [];
+  const t = now.getTime();
+  for (const c of classes) {
+    const start = classStart(c).getTime();
+    const before = start - CLASS_NOTIFY_BEFORE_MIN * 60_000;
+    if (t >= before && t < start) {
+      due.push({
+        key: `class|${c.id}|${c.start}|before`,
+        cls: c,
+        phase: "before",
+        minutesLeft: Math.ceil((start - t) / 60_000),
+      });
+    } else if (t >= start && t < start + CLASS_START_GRACE_MIN * 60_000) {
+      due.push({
+        key: `class|${c.id}|${c.start}|start`,
+        cls: c,
+        phase: "start",
+        minutesLeft: 0,
+      });
+    }
+  }
+  return due;
+}
+
+export function classReminderText(
+  r: DueClassReminder,
+  t: Translate,
+): { title: string; body: string } {
+  const c = r.cls;
+  const time = `${c.start}–${c.end}${c.room ? ` · ${c.room}` : ""}`;
+  if (r.phase === "start") {
+    return {
+      title: t("classReminder.start"),
+      body: `${c.subject}\n${time}`,
+    };
+  }
+  return {
+    title: t("reminder.title", {
+      left: t("reminder.inMinutes", { n: r.minutesLeft }),
+      title: c.subject,
+    }),
+    body: time,
+  };
+}
+
+/** 授業の通知をするかどうか (ブラウザごとに覚えておく。最初はオン) */
+const CLASS_NOTIFY_KEY = "kizunatekku.class-notify";
+const classNotifyListeners = new Set<() => void>();
+let classNotifyMemory: boolean | null = null;
+
+export function getClassNotify(): boolean {
+  if (classNotifyMemory !== null) return classNotifyMemory;
+  try {
+    return window.localStorage.getItem(CLASS_NOTIFY_KEY) !== "off";
+  } catch {
+    return true;
+  }
+}
+
+export function setClassNotify(on: boolean) {
+  classNotifyMemory = on;
+  try {
+    window.localStorage.setItem(CLASS_NOTIFY_KEY, on ? "on" : "off");
+  } catch {
+    // 保存できなくてもこのページ内では切り替わる
+  }
+  classNotifyListeners.forEach((l) => l());
+}
+
+export function subscribeClassNotify(listener: () => void) {
+  classNotifyListeners.add(listener);
+  return () => {
+    classNotifyListeners.delete(listener);
+  };
+}
+
 /** OS の通知を出す。出せなかったら false */
-export function showSystemNotification(r: DueReminder, t: Translate): boolean {
+export function showSystemNotification(
+  key: string,
+  title: string,
+  body: string,
+): boolean {
   if (!notificationsSupported() || Notification.permission !== "granted")
     return false;
   try {
-    const { title, body } = reminderText(r, t);
-    const n = new Notification(title, { body, tag: r.key });
+    const n = new Notification(title, { body, tag: key });
     n.onclick = () => {
       window.focus();
       n.close();

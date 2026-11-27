@@ -44,6 +44,9 @@ const zhTW: Messages = {
   "menu.timetableManage": "建立 / 搜尋課表",
   "menu.settings": "設定",
   "menu.language": "語言",
+  "menu.classNotify": "上課提醒（開始前5分鐘・開始時）",
+  "menu.on": "開",
+  "menu.off": "關",
   "menu.logout": "登出",
   "menu.logoutConfirm": "確定要登出嗎？",
 
@@ -80,6 +83,7 @@ const zhTW: Messages = {
   "reminder.title": "{left}：{title}",
   "reminder.body": "{time} 開始",
   "reminder.dismiss": "關閉提醒",
+  "classReminder.start": "上課了。請進行出席登記。",
 
   "color.blue": "藍",
   "color.green": "綠",

@@ -44,6 +44,9 @@ const ko: Messages = {
   "menu.timetableManage": "시간표 만들기·찾기",
   "menu.settings": "설정",
   "menu.language": "언어",
+  "menu.classNotify": "수업 알림 (5분 전·시작 시)",
+  "menu.on": "켬",
+  "menu.off": "끔",
   "menu.logout": "로그아웃",
   "menu.logoutConfirm": "로그아웃할까요?",
 
@@ -80,6 +83,7 @@ const ko: Messages = {
   "reminder.title": "{left}: {title}",
   "reminder.body": "{time} 시작",
   "reminder.dismiss": "알림 닫기",
+  "classReminder.start": "수업이 시작되었어요. 출석 등록을 해 주세요.",
 
   "color.blue": "파랑",
   "color.green": "초록",

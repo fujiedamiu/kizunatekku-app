@@ -44,6 +44,9 @@ const zhCN: Messages = {
   "menu.timetableManage": "创建 / 搜索课表",
   "menu.settings": "设置",
   "menu.language": "语言",
+  "menu.classNotify": "上课提醒（开始前5分钟・开始时）",
+  "menu.on": "开",
+  "menu.off": "关",
   "menu.logout": "退出登录",
   "menu.logoutConfirm": "确定要退出登录吗？",
 
@@ -80,6 +83,7 @@ const zhCN: Messages = {
   "reminder.title": "{left}：{title}",
   "reminder.body": "{time} 开始",
   "reminder.dismiss": "关闭提醒",
+  "classReminder.start": "上课了。请进行出勤登记。",
 
   "color.blue": "蓝",
   "color.green": "绿",

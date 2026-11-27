@@ -49,6 +49,9 @@ const ja = {
   "menu.timetableManage": "時間割の作成・検索",
   "menu.settings": "設定",
   "menu.language": "言語",
+  "menu.classNotify": "授業の通知（5分前・開始時）",
+  "menu.on": "オン",
+  "menu.off": "オフ",
   "menu.logout": "ログアウト",
   "menu.logoutConfirm": "ログアウトしますか？",
 
@@ -87,6 +90,7 @@ const ja = {
   "reminder.title": "{left}：{title}",
   "reminder.body": "{time} 開始",
   "reminder.dismiss": "お知らせを閉じる",
+  "classReminder.start": "授業開始です。出席登録を行ってください",
 
   // 色
   "color.blue": "青",

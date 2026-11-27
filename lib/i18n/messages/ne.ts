@@ -45,6 +45,9 @@ const ne: Messages = {
   "menu.timetableManage": "समय तालिका बनाउनुहोस् / खोज्नुहोस्",
   "menu.settings": "सेटिङ",
   "menu.language": "भाषा",
+  "menu.classNotify": "कक्षाको सूचना (५ मिनेट अघि · सुरु हुँदा)",
+  "menu.on": "खुला",
+  "menu.off": "बन्द",
   "menu.logout": "लगआउट",
   "menu.logoutConfirm": "लगआउट गर्ने हो?",
 
@@ -81,6 +84,7 @@ const ne: Messages = {
   "reminder.title": "{left}: {title}",
   "reminder.body": "{time} मा सुरु",
   "reminder.dismiss": "सूचना बन्द गर्नुहोस्",
+  "classReminder.start": "कक्षा सुरु भयो। कृपया हाजिरी दर्ता गर्नुहोस्।",
 
   "color.blue": "निलो",
   "color.green": "हरियो",
