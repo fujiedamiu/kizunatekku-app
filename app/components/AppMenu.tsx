@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CalendarKind } from "@/lib/events-store";
 import { LANGUAGES, useI18n } from "@/lib/i18n";
-import type { User } from "@/lib/user";
+import { LOGIN_ENABLED, type User } from "@/lib/user";
 import LanguagePicker from "./LanguagePicker";
 
 type Props = {
@@ -170,6 +170,7 @@ export default function AppMenu({
               </button>
             </section>
 
+            {LOGIN_ENABLED && (
             <section className="mt-auto space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
               <div className="px-3">
                 <p className="truncate font-medium">{user.name}</p>
@@ -187,6 +188,7 @@ export default function AppMenu({
                 {t("menu.logout")}
               </button>
             </section>
+            )}
           </nav>
         </div>
       )}
