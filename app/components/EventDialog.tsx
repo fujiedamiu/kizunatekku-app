@@ -8,6 +8,7 @@ import {
   type CalendarEvent,
   type EventColor,
 } from "@/lib/calendar";
+import { askConfirm } from "@/lib/confirm-store";
 import { describeError } from "@/lib/errors";
 import { useI18n } from "@/lib/i18n";
 import { requestNotificationPermission } from "@/lib/notifications";
@@ -94,10 +95,12 @@ export default function EventDialog({ kind, event, isNew, onClose }: Props) {
     );
   };
 
-  const handleDelete = () => {
-    if (window.confirm(t("event.deleteConfirm", { title: event.title }))) {
-      void run(() => deleteEvent(kind, event.id));
-    }
+  const handleDelete = async () => {
+    const ok = await askConfirm(
+      t("event.deleteConfirm", { title: event.title }),
+      { confirmLabel: t("common.delete"), danger: true },
+    );
+    if (ok) void run(() => deleteEvent(kind, event.id));
   };
 
   const inputClass =

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { askConfirm } from "@/lib/confirm-store";
 import type { CalendarKind } from "@/lib/events-store";
 import { LANGUAGES, useI18n } from "@/lib/i18n";
 import type { User } from "@/lib/user";
@@ -200,7 +201,9 @@ export default function AppMenu({
               </div>
               <button
                 onClick={choose(() => {
-                  if (window.confirm(t("menu.logoutConfirm"))) onLogout();
+                  void askConfirm(t("menu.logoutConfirm"), {
+                    confirmLabel: t("menu.logout"),
+                  }).then((ok) => ok && onLogout());
                 })}
                 className={itemClass()}
               >

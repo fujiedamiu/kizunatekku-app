@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth-store";
 import { useI18n, useLanguageUnchosen } from "@/lib/i18n";
 import Calendar from "./Calendar";
+import ConfirmHost from "./ConfirmHost";
 import LanguagePicker from "./LanguagePicker";
 import LoginScreen from "./LoginScreen";
 
@@ -37,6 +38,7 @@ export default function AuthGate() {
         <Calendar key={auth.user.studentId} user={auth.user} />
       )}
       {unchosen && <LanguagePicker firstTime />}
+      <ConfirmHost />
     </>
   );
 }

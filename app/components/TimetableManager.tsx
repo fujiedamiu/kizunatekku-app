@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { askConfirm, showAlert } from "@/lib/confirm-store";
 import { describeError, errorMessage } from "@/lib/errors";
 import { useI18n } from "@/lib/i18n";
 import type { TimetableView } from "@/lib/timetable";
@@ -314,7 +315,7 @@ function SubscribeButton({ timetable: tt }: { timetable: TimetableView }) {
     try {
       await setTimetableSubscribed(tt.id, !tt.subscribed);
     } catch (e) {
-      window.alert(describeError(t, e, "changeFailed"));
+      void showAlert(describeError(t, e, "changeFailed"));
     } finally {
       setBusy(false);
     }
@@ -338,12 +339,16 @@ function DeleteButton({ timetable: tt }: { timetable: TimetableView }) {
   const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const remove = async () => {
-    if (!window.confirm(t("tt.deleteConfirm", { title: tt.title }))) return;
+    const ok = await askConfirm(t("tt.deleteConfirm", { title: tt.title }), {
+      confirmLabel: t("common.delete"),
+      danger: true,
+    });
+    if (!ok) return;
     setBusy(true);
     try {
       await deleteTimetable(tt.id);
     } catch (e) {
-      window.alert(describeError(t, e, "deleteFailed"));
+      void showAlert(describeError(t, e, "deleteFailed"));
       setBusy(false);
     }
   };
