@@ -15,6 +15,8 @@ import { useI18n } from "@/lib/i18n";
 type Props = {
   /** 検索結果を選んだときに、そのカレンダー・日付へ移動する */
   onJump: (kind: CalendarKind, date: string) => void;
+  /** 未ログインのときは共通カレンダーだけを検索する */
+  sharedOnly?: boolean;
 };
 
 type Hit = { kind: CalendarKind; event: CalendarEvent };
@@ -25,7 +27,7 @@ const MAX_RESULTS = 30;
 const normalize = (s: string) => s.normalize("NFKC").toLowerCase();
 
 /** 共通・個人の両方のカレンダーから、タイトルとメモで予定を検索する */
-export default function SearchBox({ onJump }: Props) {
+export default function SearchBox({ onJump, sharedOnly = false }: Props) {
   const { t, longDate } = useI18n();
   const shared = useEvents("shared");
   const personal = useEvents("personal");
@@ -43,7 +45,7 @@ export default function SearchBox({ onJump }: Props) {
         kind: "shared" as const,
         event,
       })),
-      ...(personal.events ?? []).map((event) => ({
+      ...(sharedOnly ? [] : (personal.events ?? [])).map((event) => ({
         kind: "personal" as const,
         event,
       })),
@@ -57,7 +59,7 @@ export default function SearchBox({ onJump }: Props) {
           a.event.date.localeCompare(b.event.date) ||
           compareEvents(a.event, b.event),
       );
-  }, [q, shared.events, personal.events]);
+  }, [q, shared.events, personal.events, sharedOnly]);
 
   const shown = hits.slice(0, MAX_RESULTS);
   const expanded = open && q.length > 0;

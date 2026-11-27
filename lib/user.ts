@@ -5,16 +5,6 @@ export type User = {
   name: string;
 };
 
-/**
- * ログイン機能を使うかどうか。
- * false の間はログイン・新規登録の画面を出さず、全員を下の GUEST_USER として扱う。
- * ログインを戻すときは true にする。
- */
-export const LOGIN_ENABLED = false;
-
-/** ログイン機能を止めている間に使う、全員共通のユーザー */
-export const GUEST_USER: User = { studentId: "GUEST", name: "ゲスト" };
-
 /** 学籍番号の先頭は必ず M。画面では M の後ろの番号だけを入力してもらう */
 export const STUDENT_ID_PREFIX = "M";
 

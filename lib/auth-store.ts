@@ -16,7 +16,10 @@ const listeners = new Set<() => void>();
 const set = (next: AuthState) => {
   // ユーザーが変わったら、個人カレンダーの保存先と時間割を切り替える
   if (next.status === "user") setEventsUser(next.user.studentId);
-  else clearTimetables();
+  else {
+    setEventsUser(null);
+    clearTimetables();
+  }
   state = next;
   listeners.forEach((l) => l());
 };

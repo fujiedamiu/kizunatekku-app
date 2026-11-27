@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CalendarKind } from "@/lib/events-store";
 import { LANGUAGES, useI18n } from "@/lib/i18n";
-import { LOGIN_ENABLED, type User } from "@/lib/user";
+import type { User } from "@/lib/user";
 import LanguagePicker from "./LanguagePicker";
 
 type Props = {
-  user: User;
+  /** null = 未ログイン (共通カレンダーを見るだけ) */
+  user: User | null;
+  onLogin?: () => void;
   kind: CalendarKind;
   onSelectKind: (kind: CalendarKind) => void;
   onShowToday: () => void;
@@ -27,7 +29,9 @@ export default function AppMenu({
   onGoToday,
   onOpenTimetables,
   onLogout,
+  onLogin,
 }: Props) {
+  const kinds: CalendarKind[] = user ? KINDS : ["shared"];
   const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -114,7 +118,7 @@ export default function AppMenu({
               <h2 className="px-3 text-xs font-semibold text-zinc-500">
                 {t("menu.calendars")}
               </h2>
-              {KINDS.map((k) => (
+              {kinds.map((k) => (
                 <button
                   key={k}
                   onClick={choose(() => onSelectKind(k))}
@@ -141,15 +145,20 @@ export default function AppMenu({
               </button>
             </section>
 
-            <section className="space-y-1">
-              <h2 className="px-3 text-xs font-semibold text-zinc-500">
-                {t("menu.timetable")}
-              </h2>
-              <button onClick={choose(onOpenTimetables)} className={itemClass()}>
-                <span aria-hidden="true">📚</span>
-                {t("menu.timetableManage")}
-              </button>
-            </section>
+            {user && (
+              <section className="space-y-1">
+                <h2 className="px-3 text-xs font-semibold text-zinc-500">
+                  {t("menu.timetable")}
+                </h2>
+                <button
+                  onClick={choose(onOpenTimetables)}
+                  className={itemClass()}
+                >
+                  <span aria-hidden="true">📚</span>
+                  {t("menu.timetableManage")}
+                </button>
+              </section>
+            )}
 
             <section className="space-y-1">
               <h2 className="px-3 text-xs font-semibold text-zinc-500">
@@ -170,7 +179,18 @@ export default function AppMenu({
               </button>
             </section>
 
-            {LOGIN_ENABLED && (
+            {!user ? (
+              <section className="mt-auto space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+                <p className="px-3 text-xs text-zinc-500">{t("guest.notice")}</p>
+                <button
+                  onClick={choose(() => onLogin?.())}
+                  className={itemClass()}
+                >
+                  <span aria-hidden="true">🔑</span>
+                  {t("login.tabLogin")}
+                </button>
+              </section>
+            ) : (
             <section className="mt-auto space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
               <div className="px-3">
                 <p className="truncate font-medium">{user.name}</p>

@@ -111,6 +111,9 @@ const zhCN: Messages = {
   "login.hintRegister": "以后只需输入学号即可登录。",
   "login.hintLogin":
     "首次使用请在“注册”中登记姓名和学号。",
+  "login.back": "不登录，查看公共日历",
+  "guest.notice":
+    "登录后即可添加、编辑日程，并使用个人日历和课程表。",
 
   "tt.title": "课表",
   "tt.editTitle": "编辑课表",

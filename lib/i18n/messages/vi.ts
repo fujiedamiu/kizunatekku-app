@@ -111,6 +111,9 @@ const vi: Messages = {
   "login.hintRegister": "Từ lần sau, bạn chỉ cần mã số sinh viên để đăng nhập.",
   "login.hintLogin":
     "Nếu đây là lần đầu, hãy đăng ký họ tên và mã số sinh viên ở mục “Đăng ký”.",
+  "login.back": "Xem lịch chung mà không cần đăng nhập",
+  "guest.notice":
+    "Đăng nhập để thêm, sửa sự kiện và dùng lịch cá nhân, thời khóa biểu.",
 
   "tt.title": "Thời khóa biểu",
   "tt.editTitle": "Sửa thời khóa biểu",

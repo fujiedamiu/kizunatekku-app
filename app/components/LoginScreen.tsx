@@ -13,7 +13,7 @@ import {
 type Mode = "login" | "register";
 
 /** 初回は名前 + 学籍番号で登録、2 回目以降は学籍番号だけでログイン */
-export default function LoginScreen() {
+export default function LoginScreen({ onBack }: { onBack?: () => void }) {
   const { t } = useI18n();
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
@@ -152,6 +152,16 @@ export default function LoginScreen() {
         <p className="text-center text-xs text-zinc-500">
           {mode === "register" ? t("login.hintRegister") : t("login.hintLogin")}
         </p>
+
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="w-full text-center text-sm text-blue-600 hover:underline dark:text-blue-400"
+          >
+            {t("login.back")}
+          </button>
+        )}
       </div>
     </main>
   );

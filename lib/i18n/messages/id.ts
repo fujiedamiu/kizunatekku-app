@@ -113,6 +113,9 @@ const id: Messages = {
     "Selanjutnya, Anda bisa masuk hanya dengan nomor induk mahasiswa.",
   "login.hintLogin":
     "Baru pertama kali? Daftarkan nama dan nomor induk mahasiswa Anda melalui “Daftar”.",
+  "login.back": "Lihat kalender bersama tanpa masuk",
+  "guest.notice":
+    "Masuk untuk menambah atau mengubah acara serta memakai kalender pribadi dan jadwal kuliah.",
 
   "tt.title": "Jadwal Kuliah",
   "tt.editTitle": "Edit jadwal kuliah",

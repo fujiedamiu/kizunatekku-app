@@ -17,13 +17,21 @@ type Props = {
   today: string;
   /** 今日の時間割の授業 */
   classes: ClassOccurrence[] | null;
+  /** 未ログインのときは共通カレンダーだけを出す */
+  sharedOnly?: boolean;
   onClose: () => void;
 };
 
-const KINDS: CalendarKind[] = ["shared", "personal"];
-
 /** 起動時に、共通・個人カレンダーの今日の予定をまとめて表示するポップアップ */
-export default function TodayDialog({ today, classes, onClose }: Props) {
+export default function TodayDialog({
+  today,
+  classes,
+  sharedOnly = false,
+  onClose,
+}: Props) {
+  const KINDS: CalendarKind[] = sharedOnly
+    ? ["shared"]
+    : ["shared", "personal"];
   const { t, longDate } = useI18n();
   const shared = useEvents("shared");
   const personal = useEvents("personal");
@@ -117,6 +125,7 @@ export default function TodayDialog({ today, classes, onClose }: Props) {
             );
           })}
 
+          {!sharedOnly && (
           <div className="space-y-1">
             <h3 className="text-xs font-semibold text-zinc-500">{t("today.timetable")}</h3>
             {!classes ? (
@@ -149,6 +158,7 @@ export default function TodayDialog({ today, classes, onClose }: Props) {
               </ul>
             )}
           </div>
+          )}
         </div>
 
         <button

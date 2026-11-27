@@ -111,6 +111,9 @@ const ko: Messages = {
   "login.hintRegister": "다음부터는 학번만으로 로그인할 수 있어요.",
   "login.hintLogin":
     "처음이라면 ‘회원가입’에서 이름과 학번을 등록해 주세요.",
+  "login.back": "로그인하지 않고 공용 캘린더 보기",
+  "guest.notice":
+    "로그인하면 일정 추가·수정과 개인 캘린더, 시간표를 사용할 수 있어요.",
 
   "tt.title": "시간표",
   "tt.editTitle": "시간표 편집",

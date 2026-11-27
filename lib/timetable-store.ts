@@ -64,8 +64,15 @@ function subscribe(listener: () => void) {
 
 const SERVER_STATE: TimetablesState = { timetables: null, error: null };
 
-export function useMyTimetables(): TimetablesState {
-  return useSyncExternalStore(subscribe, () => state, () => SERVER_STATE);
+const noSubscribe = () => () => {};
+
+/** enabled が false (未ログイン) の間はサーバーに問い合わせない */
+export function useMyTimetables(enabled = true): TimetablesState {
+  return useSyncExternalStore(
+    enabled ? subscribe : noSubscribe,
+    () => (enabled ? state : SERVER_STATE),
+    () => SERVER_STATE,
+  );
 }
 
 /** ログアウト時などに、前のユーザーの時間割を消しておく */

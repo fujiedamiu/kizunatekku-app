@@ -56,11 +56,23 @@ function sortItems(items: DayItem[]) {
   });
 }
 
-export default function Calendar({ user }: { user: User }) {
+/**
+ * user が null (未ログイン) のときは、共通カレンダーを見るだけの表示にする。
+ * 予定の追加・編集、個人カレンダー、時間割はログインしてから使える。
+ */
+export default function Calendar({
+  user,
+  onLogin,
+}: {
+  user: User | null;
+  onLogin?: () => void;
+}) {
   const { t, longDate, monthTitle, weekdayShort } = useI18n();
-  const kind = useCalendarKind();
+  const guest = !user;
+  const storedKind = useCalendarKind();
+  const kind: CalendarKind = guest ? "shared" : storedKind;
   const { events, error } = useEvents(kind);
-  const { timetables } = useMyTimetables();
+  const { timetables } = useMyTimetables(!guest);
   const today = useToday();
 
   // null の間は「今日」を基準にする
@@ -110,13 +122,22 @@ export default function Calendar({ user }: { user: User }) {
           onGoToday={goToday}
           onOpenTimetables={() => setShowTimetables(true)}
           onLogout={() => void logout()}
+          onLogin={onLogin}
         />
         <h1 className="hidden shrink-0 text-lg font-bold sm:block">
           {t("app.title")}
         </h1>
         <div className="flex flex-1 justify-end">
-          <SearchBox onJump={jumpTo} />
+          <SearchBox onJump={jumpTo} sharedOnly={guest} />
         </div>
+        {guest && (
+          <button
+            onClick={onLogin}
+            className="shrink-0 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            {t("login.tabLogin")}
+          </button>
+        )}
       </div>
     </header>
   );
@@ -194,6 +215,18 @@ export default function Calendar({ user }: { user: User }) {
       {header}
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4 p-4">
         {/* カレンダーの切り替え */}
+        {guest ? (
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-800 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200">
+            <span className="font-semibold">{t("calendar.shared")}</span>
+            <span className="flex-1">{t("guest.notice")}</span>
+            <button
+              onClick={onLogin}
+              className="font-medium text-blue-700 underline dark:text-blue-300"
+            >
+              {t("login.tabLogin")}
+            </button>
+          </div>
+        ) : (
         <div className="flex flex-wrap items-center gap-3">
           <div
             role="tablist"
@@ -222,6 +255,7 @@ export default function Calendar({ user }: { user: User }) {
               : t("calendar.personalDesc")}
           </p>
         </div>
+        )}
 
         {error && (
           <p
@@ -296,7 +330,7 @@ export default function Calendar({ user }: { user: User }) {
                   <button
                     key={key}
                     onClick={() => setSelected(key)}
-                    onDoubleClick={() => events && openNew(key)}
+                    onDoubleClick={() => !guest && events && openNew(key)}
                     aria-label={t("calendar.dayAria", {
                       date: longDate(key),
                       n: items.length,
@@ -359,13 +393,15 @@ export default function Calendar({ user }: { user: User }) {
                 </p>
                 <h3 className="font-semibold">{longDate(selectedKey)}</h3>
               </div>
-              <button
-                onClick={() => openNew(selectedKey)}
-                disabled={!events}
-                className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-              >
-                {t("common.add")}
-              </button>
+              {!guest && (
+                <button
+                  onClick={() => openNew(selectedKey)}
+                  disabled={!events}
+                  className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {t("common.add")}
+                </button>
+              )}
             </div>
 
             {selectedItems.length === 0 ? (
@@ -375,7 +411,14 @@ export default function Calendar({ user }: { user: User }) {
             ) : (
               <ul className="space-y-2">
                 {selectedItems.map((item) =>
-                  item.type === "event" ? (
+                  item.type === "event" && guest ? (
+                    <li
+                      key={item.key}
+                      className="flex w-full items-start gap-3 rounded-xl p-2"
+                    >
+                      <EventSummary event={item.event} t={t} />
+                    </li>
+                  ) : item.type === "event" ? (
                     <li key={item.key}>
                       <button
                         onClick={() =>
@@ -400,11 +443,13 @@ export default function Calendar({ user }: { user: User }) {
               </ul>
             )}
 
-            <p className="mt-auto text-xs text-zinc-400">
-              {t("calendar.hintDoubleClick")}
-              {kind === "personal" &&
-                ` ${t("calendar.hintTimetable")}`}
-            </p>
+            {!guest && (
+              <p className="mt-auto text-xs text-zinc-400">
+                {t("calendar.hintDoubleClick")}
+                {kind === "personal" &&
+                  ` ${t("calendar.hintTimetable")}`}
+              </p>
+            )}
           </aside>
         </div>
 
@@ -412,11 +457,12 @@ export default function Calendar({ user }: { user: User }) {
           <TodayDialog
             today={today}
             classes={timetables ? todayClasses : null}
+            sharedOnly={guest}
             onClose={closeToday}
           />
         )}
 
-        {showTimetables && (
+        {showTimetables && !guest && (
           <TimetableManager today={today} onClose={closeTimetables} />
         )}
 

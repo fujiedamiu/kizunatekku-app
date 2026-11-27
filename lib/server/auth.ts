@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
-import { GUEST_USER, LOGIN_ENABLED, type User } from "../user";
+import type { User } from "../user";
 import { readData, updateData } from "./db";
 import { apiError } from "./http";
 
@@ -68,7 +68,6 @@ export async function endSession() {
 
 /** ログイン中のユーザー。未ログインなら null */
 export async function currentUser(): Promise<User | null> {
-  if (!LOGIN_ENABLED) return GUEST_USER;
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   const sessions = await readData<Sessions>("sessions", {});

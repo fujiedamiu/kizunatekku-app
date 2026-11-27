@@ -111,6 +111,9 @@ const en: Messages = {
   "login.hintRegister": "Next time, you can log in with just your student ID.",
   "login.hintLogin":
     "First time here? Register your name and student ID under “Sign up”.",
+  "login.back": "View the shared calendar without logging in",
+  "guest.notice":
+    "Log in to add or edit events and to use your personal calendar and timetables.",
 
   "tt.title": "Timetable",
   "tt.editTitle": "Edit timetable",

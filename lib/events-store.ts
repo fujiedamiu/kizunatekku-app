@@ -45,12 +45,19 @@ const LEGACY_PERSONAL_KEY = "kizunatekku.events.v1";
 let PERSONAL_KEY = LEGACY_PERSONAL_KEY;
 let resetPersonal: () => void = () => {};
 
-/** 個人カレンダーをログイン中のユーザーごとに分けて保存する */
-export function setEventsUser(studentId: string) {
-  const key = `kizunatekku.events.v2:${studentId}`;
+/**
+ * 個人カレンダーをログイン中のユーザーごとに分けて保存する。
+ * null (未ログイン) のときは、前にログインしていた人の予定が見えないよう空の保存先にする。
+ */
+export function setEventsUser(studentId: string | null) {
+  const key = studentId
+    ? `kizunatekku.events.v2:${studentId}`
+    : "kizunatekku.events.v2:guest";
   if (key === PERSONAL_KEY) return;
   try {
-    const legacy = window.localStorage.getItem(LEGACY_PERSONAL_KEY);
+    const legacy = studentId
+      ? window.localStorage.getItem(LEGACY_PERSONAL_KEY)
+      : null;
     if (legacy !== null && window.localStorage.getItem(key) === null) {
       window.localStorage.setItem(key, legacy);
       window.localStorage.removeItem(LEGACY_PERSONAL_KEY);

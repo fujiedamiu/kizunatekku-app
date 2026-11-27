@@ -10,10 +10,9 @@ import {
 
 const noStore = { "Cache-Control": "no-store" };
 
-/** 共通カレンダーの予定一覧 */
+/** 共通カレンダーの予定一覧 (ログインしていなくても見られる) */
 export async function GET() {
   await connection();
-  if (!(await currentUser())) return unauthorized();
   return Response.json(await listSharedEvents(), { headers: noStore });
 }
 

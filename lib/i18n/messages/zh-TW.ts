@@ -111,6 +111,9 @@ const zhTW: Messages = {
   "login.hintRegister": "之後只要輸入學號即可登入。",
   "login.hintLogin":
     "第一次使用請從「註冊」登錄姓名與學號。",
+  "login.back": "不登入，查看共用行事曆",
+  "guest.notice":
+    "登入後即可新增、編輯行程，並使用個人行事曆與課表。",
 
   "tt.title": "課表",
   "tt.editTitle": "編輯課表",
